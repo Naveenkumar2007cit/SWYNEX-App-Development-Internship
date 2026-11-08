@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    scroll-behavior: smooth;
+  }
+  :focus-visible { @apply outline-none ring-2 ring-teal-400 ring-offset-2; }
+}
+
+@layer utilities {
+  .safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* Leaflet map z-index fix */
+.leaflet-pane { z-index: 10 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 20 !important; }
