@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { Bus, Search, Users, AlertOctagon, Bookmark, Menu, X } from "lucide-react";
+import { Bus, Search, Compass, Users, AlertOctagon, Bookmark, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
   { to: "/",             icon: Bus,           label: "Home" },
+  { to: "/planner",      icon: Compass,       label: "Planner" },
   { to: "/search",       icon: Search,        label: "Search" },
   { to: "/crowd",        icon: Users,         label: "Crowd" },
   { to: "/report",       icon: AlertOctagon,  label: "Report" },
