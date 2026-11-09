@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Star, Clock, AlertCircle, ChevronRight, Bus, ArrowRight, Zap } from "lucide-react";
 import { getRecentSearches } from "../services/routeService";
-import { getSavedRoutes } from "../services/savedRoutesService";
+import { getSavedRoutes, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService";
 import { nearbyStops } from "../data/demoRoutes";
 import { demoAlerts } from "../data/demoAlerts";
 import AlertCard from "../components/AlertCard";
@@ -15,9 +15,16 @@ export default function Home() {
   const [saved, setSaved]     = useState([]);
   const [alerts, setAlerts]   = useState(demoAlerts.filter((a) => a.isActive).slice(0, 2));
 
+  const loadSaved = () => {
+    getSavedRoutes().then(setSaved);
+  };
+
   useEffect(() => {
     setRecent(getRecentSearches());
-    getSavedRoutes().then(setSaved);
+    loadSaved();
+
+    window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, loadSaved);
+    return () => window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, loadSaved);
   }, []);
 
   const handleSearch = (e) => {
@@ -135,17 +142,19 @@ export default function Home() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
-              <Star className="h-4 w-4" />Favourite Routes
+              <Star className="h-4 w-4 text-amber-400" />Favourite Routes
             </h2>
-            <button onClick={() => navigate("/saved")} className="text-xs text-teal-600 font-medium">View all</button>
+            <button onClick={() => navigate("/saved")} className="text-xs text-teal-600 font-semibold hover:underline">
+              View all ({saved.length}) →
+            </button>
           </div>
           <div className="space-y-2">
-            {saved.slice(0, 2).map((route) => (
+            {saved.slice(0, 3).map((route) => (
               <button key={route.id} onClick={() => navigate(`/route/${route.id}`)}
                 className="w-full bg-white rounded-xl shadow-card border border-gray-100 px-4 py-3 flex items-center gap-3 hover:shadow-card-hover transition-all text-left"
               >
                 <div className="bg-navy-800 text-white rounded-lg px-2 py-1 text-xs font-bold">{route.busNumber}</div>
-                <span className="text-sm text-gray-700 flex-1">{route.from} → {route.to}</span>
+                <span className="text-sm text-gray-700 flex-1 truncate">{route.from} → {route.to}</span>
                 <ChevronRight className="h-4 w-4 text-gray-300" />
               </button>
             ))}

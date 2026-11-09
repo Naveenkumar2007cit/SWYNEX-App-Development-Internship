@@ -1,17 +1,58 @@
 import { useNavigate } from "react-router-dom";
-import { Clock, MapPin, Star, ChevronRight, Bus } from "lucide-react";
-import { isRouteSaved, saveRoute, unsaveRoute } from "../services/savedRoutesService";
-import { useState } from "react";
+import { Clock, MapPin, Star, ChevronRight, Bus, Check, AlertTriangle } from "lucide-react";
+import { isRouteSaved, saveRoute, unsaveRoute, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService";
+import { useState, useEffect } from "react";
 
-export default function RouteCard({ route, showSave = true }) {
+export default function RouteCard({ route, showSave = true, onSaveStatusChange }) {
   const navigate = useNavigate();
-  const [saved, setSaved] = useState(() => isRouteSaved(route.id));
+  const [saved, setSaved] = useState(() => (route?.id ? isRouteSaved(route.id) : false));
+  const [toast, setToast] = useState(null); // { type: 'success' | 'warning', message: string }
+
+  useEffect(() => {
+    if (route?.id) {
+      setSaved(isRouteSaved(route.id));
+    }
+    const update = () => {
+      if (route?.id) {
+        setSaved(isRouteSaved(route.id));
+      }
+    };
+    window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, update);
+    return () => window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, update);
+  }, [route?.id]);
+
+  const triggerToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((curr) => (curr?.message === message ? null : curr));
+    }, 3000);
+  };
 
   const handleSave = async (e) => {
     e.stopPropagation();
-    if (saved) { await unsaveRoute(route.id); setSaved(false); }
-    else { await saveRoute(route); setSaved(true); }
+    if (!route || !route.id) return;
+
+    if (saved) {
+      await unsaveRoute(route.id);
+      setSaved(false);
+      triggerToast("warning", `Removed Bus ${route.busNumber} from favourites`);
+      if (onSaveStatusChange) onSaveStatusChange(route.id, false);
+    } else {
+      const res = await saveRoute(route);
+      if (res.success) {
+        setSaved(true);
+        triggerToast("success", `Saved Bus ${route.busNumber} to favourites!`);
+        if (onSaveStatusChange) onSaveStatusChange(route.id, true);
+      } else if (res.alreadySaved) {
+        setSaved(true);
+        triggerToast("warning", res.message);
+      } else {
+        triggerToast("warning", res.message || "Could not save route");
+      }
+    }
   };
+
+  if (!route) return null;
 
   const typeBadge = {
     "Ordinary":     "bg-navy-100 text-navy-700",
@@ -22,8 +63,27 @@ export default function RouteCard({ route, showSave = true }) {
   return (
     <div
       onClick={() => navigate(`/route/${route.id}`)}
-      className="bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-200 cursor-pointer border border-gray-100 p-4 flex flex-col gap-3"
+      className="bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-200 cursor-pointer border border-gray-100 p-4 flex flex-col gap-3 relative overflow-hidden"
     >
+      {/* Mini notification banner if save/unsave clicked inside card */}
+      {toast && (
+        <div
+          className={`text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium transition-all ${
+            toast.type === "success"
+              ? "bg-teal-50 text-teal-700 border border-teal-200"
+              : "bg-amber-50 text-amber-700 border border-amber-200"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {toast.type === "success" ? (
+            <Check className="h-3.5 w-3.5 text-teal-600 flex-shrink-0" />
+          ) : (
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+          )}
+          <span className="truncate">{toast.message}</span>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className="bg-navy-800 text-white rounded-xl px-3 py-1.5 font-bold text-sm flex items-center gap-1.5">
@@ -35,7 +95,12 @@ export default function RouteCard({ route, showSave = true }) {
         {showSave && (
           <button
             onClick={handleSave}
-            className={`p-2 rounded-full transition-colors ${saved ? "text-amber-500 bg-amber-50" : "text-gray-300 hover:text-amber-400 hover:bg-amber-50"}`}
+            title={saved ? "Remove from saved favourites" : "Save to favourites"}
+            className={`p-2 rounded-full transition-all active:scale-95 ${
+              saved
+                ? "text-amber-500 bg-amber-50 hover:bg-amber-100"
+                : "text-gray-300 hover:text-amber-400 hover:bg-amber-50"
+            }`}
             aria-label={saved ? "Remove from saved" : "Save route"}
           >
             <Star className="h-4 w-4" fill={saved ? "currentColor" : "none"} />

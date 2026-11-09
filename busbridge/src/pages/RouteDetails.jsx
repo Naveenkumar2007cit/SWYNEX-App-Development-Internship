@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, MapPin, Bus, Star, Navigation } from "lucide-react";
+import { ArrowLeft, Clock, MapPin, Bus, Star, Navigation, CheckCircle2, AlertTriangle, X } from "lucide-react";
 import { getRouteById } from "../services/routeService";
-import { saveRoute, unsaveRoute, isRouteSaved } from "../services/savedRoutesService";
+import { saveRoute, unsaveRoute, isRouteSaved, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService";
 import BusStopList from "../components/BusStopList";
 import MapView from "../components/MapView";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -14,14 +14,48 @@ export default function RouteDetails() {
   const [loading, setLoading] = useState(true);
   const [saved, setSaved]   = useState(false);
   const [tab, setTab]       = useState("stops");
+  const [feedback, setFeedback] = useState(null); // { type: 'success' | 'warning' | 'info', message: string }
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message });
+    setTimeout(() => {
+      setFeedback((curr) => (curr?.message === message ? null : curr));
+    }, 3500);
+  };
 
   useEffect(() => {
-    getRouteById(id).then((r) => { setRoute(r); setSaved(isRouteSaved(id)); setLoading(false); });
+    getRouteById(id).then((r) => {
+      setRoute(r);
+      if (r?.id) setSaved(isRouteSaved(r.id));
+      setLoading(false);
+    });
+
+    const updateSaved = () => {
+      if (id) setSaved(isRouteSaved(id));
+    };
+    window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, updateSaved);
+    return () => window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, updateSaved);
   }, [id]);
 
   const handleSave = async () => {
-    if (saved) { await unsaveRoute(id); setSaved(false); }
-    else { await saveRoute(route); setSaved(true); }
+    if (!route || !route.id) return;
+
+    if (saved) {
+      await unsaveRoute(route.id);
+      setSaved(false);
+      showFeedback("info", `Bus ${route.busNumber} removed from favourites.`);
+    } else {
+      const res = await saveRoute(route);
+      if (res.success) {
+        setSaved(true);
+        showFeedback("success", `Bus ${route.busNumber} saved to favourites!`);
+      } else if (res.alreadySaved) {
+        setSaved(true);
+        showFeedback("warning", res.message);
+      } else {
+        showFeedback("warning", res.message || "Failed to save route.");
+      }
+    }
   };
 
   if (loading) return <div className="max-w-2xl mx-auto px-4 py-10"><LoadingSpinner text="Loading route details..." /></div>;
@@ -38,6 +72,36 @@ export default function RouteDetails() {
 
   return (
     <div className="max-w-2xl mx-auto pb-24 md:pb-8">
+      {/* Toast Feedback Notification */}
+      {feedback && (
+        <div className="sticky top-16 z-30 px-4 pt-2">
+          <div
+            className={`p-3.5 rounded-xl text-sm flex items-center justify-between shadow-lg border transition-all ${
+              feedback.type === "success"
+                ? "bg-teal-600 text-white border-teal-500"
+                : feedback.type === "warning"
+                ? "bg-amber-500 text-white border-amber-400"
+                : "bg-navy-800 text-white border-navy-700"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {feedback.type === "success" ? (
+                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+              )}
+              <span className="font-medium text-xs sm:text-sm">{feedback.message}</span>
+            </div>
+            <button
+              onClick={() => setFeedback(null)}
+              className="p-1 hover:bg-white/20 rounded-lg text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-navy-800 text-white px-4 pt-4 pb-6">
         <div className="flex items-center gap-3 mb-4">
@@ -45,9 +109,18 @@ export default function RouteDetails() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <span className="text-sm font-medium text-navy-200">Route Details</span>
-          <div className="ml-auto">
-            <button onClick={handleSave} className={`p-2 rounded-xl transition-colors ${saved ? "text-amber-400 bg-amber-400/20" : "text-navy-300 hover:bg-white/10"}`}>
-              <Star className="h-5 w-5" fill={saved ? "currentColor" : "none"} />
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleSave}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                saved
+                  ? "bg-amber-400 text-navy-950 shadow-md hover:bg-amber-300"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+              title={saved ? "Remove from saved routes" : "Save this route"}
+            >
+              <Star className="h-4 w-4" fill={saved ? "currentColor" : "none"} />
+              <span>{saved ? "Saved" : "Save Route"}</span>
             </button>
           </div>
         </div>
