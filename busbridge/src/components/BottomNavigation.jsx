@@ -41,7 +41,7 @@ export default function BottomNavigation() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 lg:hidden safe-area-pb shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-white/90 border-t border-emerald-100 lg:hidden safe-area-pb shadow-lg shadow-emerald-950/5">
       <div className="flex">
         {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
           <NavLink
@@ -49,27 +49,30 @@ export default function BottomNavigation() {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center flex-1 py-1.5 gap-0.5 text-[10px] font-medium transition-colors relative ${
-                isActive ? "text-teal-600 font-bold" : "text-gray-400 hover:text-gray-600"
+              `flex-1 py-2 flex flex-col items-center justify-center text-[10px] font-semibold transition-all relative ${
+                isActive ? "text-emerald-700" : "text-slate-500 hover:text-emerald-600"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className={`p-1 rounded-xl transition-colors relative ${isActive ? "bg-teal-50" : ""}`}>
-                  <Icon className="h-4 w-4" />
+                <div className={`p-1 rounded-xl transition-all relative ${isActive ? "bg-emerald-100/70 text-emerald-700 scale-110" : ""}`}>
+                  <Icon className="h-5 w-5" />
                   {hasSavedBadge && savedCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-amber-400 text-navy-950 font-black text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                      {savedCount > 9 ? "9+" : savedCount}
+                    <span className="absolute -top-1 -right-1.5 bg-amber-400 text-slate-950 font-black text-[9px] px-1 rounded-full shadow-xs">
+                      {savedCount}
                     </span>
                   )}
                   {hasAlertBadge && unreadAlertCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-600 text-white font-black text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                      {unreadAlertCount > 9 ? "9+" : unreadAlertCount}
+                    <span className="absolute -top-1 -right-1.5 bg-rose-500 text-white font-black text-[9px] px-1 rounded-full shadow-xs animate-pulse">
+                      {unreadAlertCount}
                     </span>
                   )}
                 </div>
-                <span>{label}</span>
+                <span className="mt-0.5 tracking-tight">{label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 w-8 h-0.5 bg-emerald-600 rounded-full" />
+                )}
               </>
             )}
           </NavLink>

@@ -15,12 +15,12 @@ import {
 } from "lucide-react";
 
 const severityConfig = {
-  info:     { bg: "bg-blue-50/90",   border: "border-blue-200",   text: "text-blue-900",   icon: Info,          iconColor: "text-blue-600",    badge: "Info" },
-  low:      { bg: "bg-blue-50/90",   border: "border-blue-200",   text: "text-blue-900",   icon: Info,          iconColor: "text-blue-600",    badge: "Low Severity" },
-  warning:  { bg: "bg-amber-50/90",  border: "border-amber-200",  text: "text-amber-900",  icon: AlertTriangle, iconColor: "text-amber-600",   badge: "Moderate" },
-  medium:   { bg: "bg-amber-50/90",  border: "border-amber-200",  text: "text-amber-900",  icon: AlertTriangle, iconColor: "text-amber-600",   badge: "Medium Severity" },
-  critical: { bg: "bg-rose-50/90",   border: "border-rose-200",   text: "text-rose-900",   icon: XCircle,       iconColor: "text-rose-600",    badge: "High Severity" },
-  high:     { bg: "bg-rose-50/90",   border: "border-rose-200",   text: "text-rose-900",   icon: XCircle,       iconColor: "text-rose-600",    badge: "High Severity" },
+  info:     { bg: "bg-emerald-50/90",   border: "border-emerald-200",   text: "text-emerald-950",   icon: Info,          iconColor: "text-emerald-600",    badge: "Info",             pulse: "bg-emerald-500" },
+  low:      { bg: "bg-teal-50/90",      border: "border-teal-200",      text: "text-teal-950",      icon: Info,          iconColor: "text-teal-600",       badge: "Low Severity",     pulse: "bg-teal-500" },
+  warning:  { bg: "bg-amber-50/95",     border: "border-amber-300",     text: "text-amber-950",     icon: AlertTriangle, iconColor: "text-amber-600",      badge: "Moderate",         pulse: "bg-amber-500" },
+  medium:   { bg: "bg-amber-50/95",     border: "border-amber-300",     text: "text-amber-950",     icon: AlertTriangle, iconColor: "text-amber-600",      badge: "Medium Severity",  pulse: "bg-amber-500" },
+  critical: { bg: "bg-rose-50/95",      border: "border-rose-300",      text: "text-rose-950",      icon: XCircle,       iconColor: "text-rose-600",       badge: "High Severity",    pulse: "bg-rose-500" },
+  high:     { bg: "bg-rose-50/95",      border: "border-rose-300",      text: "text-rose-950",      icon: XCircle,       iconColor: "text-rose-600",       badge: "High Severity",    pulse: "bg-rose-500" },
 };
 
 function AlertCard({
@@ -48,18 +48,22 @@ function AlertCard({
 
   return (
     <div
-      className={`${c.bg} ${c.border} border rounded-2xl p-4 sm:p-5 transition-all relative overflow-hidden shadow-sm space-y-3 ${
-        isRelevant ? "ring-2 ring-amber-400/60" : ""
+      className={`${c.bg} ${c.border} border-2 rounded-2xl p-4 sm:p-5 transition-all relative overflow-hidden shadow-md space-y-3 backdrop-blur-sm ${
+        isRelevant ? "ring-2 ring-amber-400 ring-offset-1" : ""
       } ${isRead ? "opacity-75" : "opacity-100"}`}
     >
       {/* Top Header: Category, Severity, Relevance & Read/Unread Status */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Icon className={`${c.iconColor} h-4 w-4 flex-shrink-0 mt-0.5`} />
-          <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+          <span className="relative flex h-2.5 w-2.5 mr-1">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${c.pulse} opacity-75`} />
+            <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${c.pulse}`} />
+          </span>
+          <Icon className={`${c.iconColor} h-4 w-4 flex-shrink-0`} />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
             {categoryLabel}
           </span>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/70 ${c.text} ${c.border}`}>
+          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-white/90 shadow-2xs ${c.text} ${c.border}`}>
             {c.badge}
           </span>
 
