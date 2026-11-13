@@ -6,13 +6,62 @@ import {
   ChevronRight,
   Shuffle,
   ShieldCheck,
-  CheckCircle,
+  Star,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  isRouteSaved,
+  saveRoute,
+  unsaveRoute,
+  SAVED_ROUTES_CHANGE_EVENT,
+} from "../services/savedRoutesService.js";
 
 export default function JourneyCard({ journey, onSelect, isSelected = false }) {
   if (!journey) return null;
 
   const isDirect = journey.transfersCount === 0;
+  const [saved, setSaved] = useState(() => isRouteSaved(journey));
+  const [toast, setToast] = useState(null); // { type: 'success' | 'warning', message: string }
+
+  useEffect(() => {
+    setSaved(isRouteSaved(journey));
+
+    const handleUpdate = () => {
+      setSaved(isRouteSaved(journey));
+    };
+
+    window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, handleUpdate);
+    return () => window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, handleUpdate);
+  }, [journey]);
+
+  const triggerToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((curr) => (curr?.message === message ? null : curr));
+    }, 3200);
+  };
+
+  const handleToggleSave = async (e) => {
+    e.stopPropagation();
+    if (saved) {
+      const res = await unsaveRoute(journey.id);
+      setSaved(false);
+      triggerToast("warning", res.message || "Removed from saved journeys");
+    } else {
+      const res = await saveRoute(journey);
+      if (res.success) {
+        setSaved(true);
+        triggerToast("success", res.message);
+      } else if (res.alreadySaved) {
+        setSaved(true);
+        triggerToast("warning", res.message);
+      } else {
+        triggerToast("warning", res.message || "Could not save journey");
+      }
+    }
+  };
 
   return (
     <div
@@ -23,7 +72,28 @@ export default function JourneyCard({ journey, onSelect, isSelected = false }) {
           : "border-gray-100 hover:border-navy-200"
       }`}
     >
-      {/* Badge ribbon */}
+      {/* Mini notification banner if save/unsave clicked inside card */}
+      {toast && (
+        <div
+          className={`mb-3 text-xs px-3 py-1.5 rounded-lg flex items-center justify-between gap-1.5 font-medium transition-all ${
+            toast.type === "success"
+              ? "bg-teal-50 text-teal-700 border border-teal-200"
+              : "bg-amber-50 text-amber-700 border border-amber-200"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center gap-1.5 truncate">
+            {toast.type === "success" ? (
+              <Check className="h-3.5 w-3.5 text-teal-600 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+            )}
+            <span className="truncate">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Badge ribbon + Save Button */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2 flex-wrap">
           {isDirect ? (
@@ -39,9 +109,25 @@ export default function JourneyCard({ journey, onSelect, isSelected = false }) {
           )}
         </div>
 
-        <div className="flex items-center gap-1 text-navy-900 font-bold text-sm">
-          <Clock className="h-4 w-4 text-teal-600" />
-          <span>{journey.totalDuration} min</span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 text-navy-900 font-bold text-sm">
+            <Clock className="h-4 w-4 text-teal-600" />
+            <span>{journey.totalDuration} min</span>
+          </div>
+
+          {/* 1-Click Save/Unsave Button */}
+          <button
+            onClick={handleToggleSave}
+            title={saved ? "Remove from saved journeys" : "Save this journey to favourites"}
+            aria-label={saved ? "Remove from saved" : "Save journey"}
+            className={`p-2 rounded-xl transition-all active:scale-95 ${
+              saved
+                ? "text-amber-500 bg-amber-50 hover:bg-amber-100"
+                : "text-gray-300 hover:text-amber-400 hover:bg-amber-50"
+            }`}
+          >
+            <Star className="h-4 w-4" fill={saved ? "currentColor" : "none"} />
+          </button>
         </div>
       </div>
 
