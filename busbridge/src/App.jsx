@@ -27,7 +27,7 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-b from-emerald-50/60 via-slate-50 to-teal-50/30 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-950">
+      <div className="min-h-screen bg-gradient-to-b from-emerald-50/60 via-slate-50 to-teal-50/30 dark:from-slate-950 dark:via-navy-950 dark:to-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-950 transition-colors">
         <Navbar />
         <main className="flex-1">
           <Suspense fallback={<PageLoader />}>

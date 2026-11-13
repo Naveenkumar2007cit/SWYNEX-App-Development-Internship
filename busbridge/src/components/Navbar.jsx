@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bus, Search, Compass, Users, AlertOctagon, Bookmark, Bell, Navigation, Menu, X } from "lucide-react";
+import { Bus, Search, Compass, Users, AlertOctagon, Bookmark, Bell, Navigation, Menu, X, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getLocalSaved, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService.js";
 import { getStoredAlerts, getReadNotificationIds, NOTIFICATIONS_CHANGE_EVENT } from "../services/alertService.js";
@@ -19,6 +19,21 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem("busbridge_theme") === "dark";
+  });
+
+  const toggleDarkMode = () => {
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("busbridge_theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("busbridge_theme", "light");
+    }
+  };
 
   const updateCounts = () => {
     const list = getLocalSaved();
@@ -31,6 +46,12 @@ export default function Navbar() {
   };
 
   useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
     updateCounts();
 
     window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, updateCounts);
@@ -42,12 +63,12 @@ export default function Navbar() {
       window.removeEventListener(NOTIFICATIONS_CHANGE_EVENT, updateCounts);
       window.removeEventListener("storage", updateCounts);
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-navy-900/90 border-b border-white/10 text-white shadow-lg transition-all">
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-navy-900/90 dark:bg-navy-950/95 border-b border-white/10 text-white shadow-lg transition-all">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <NavLink to="/" className="flex items-center gap-2.5 font-extrabold text-xl tracking-tight group">
+        <NavLink to="/" className="flex items-center gap-2.5 font-extrabold text-xl tracking-tight group focus:outline-none focus:ring-2 focus:ring-emerald-400 rounded-xl p-1">
           <div className="bg-gradient-to-tr from-emerald-600 to-teal-400 p-2 rounded-xl shadow-md group-hover:scale-105 transition-transform">
             <Bus className="h-5 w-5 text-white" />
           </div>
@@ -62,40 +83,61 @@ export default function Navbar() {
         </NavLink>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-1.5 bg-white/5 backdrop-blur-sm p-1.5 rounded-2xl border border-white/10">
-          {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/"}
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all relative ${
-                  isActive
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-900/20"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
-                }`
-              }
-            >
-              <Icon className="h-4 w-4" />
-              <span>{label}</span>
+        <div className="hidden lg:flex items-center gap-3">
+          <nav className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm p-1.5 rounded-2xl border border-white/10">
+            {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === "/"}
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all relative focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+                    isActive
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-900/20"
+                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                  }`
+                }
+              >
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
 
-              {hasSavedBadge && savedCount > 0 && (
-                <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-xs">
-                  {savedCount}
-                </span>
-              )}
+                {hasSavedBadge && savedCount > 0 && (
+                  <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-xs">
+                    {savedCount}
+                  </span>
+                )}
 
-              {hasAlertBadge && unreadAlertCount > 0 && (
-                <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
-                  {unreadAlertCount}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+                {hasAlertBadge && unreadAlertCount > 0 && (
+                  <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
+                    {unreadAlertCount}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleDarkMode}
+            title={isDarkMode ? "Switch to Neo-Transit Light" : "Switch to Metro Dark"}
+            aria-label="Toggle Dark Mode"
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-teal-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          >
+            {isDarkMode ? <Sun className="h-4 w-4 text-amber-300" /> : <Moon className="h-4 w-4 text-teal-200" />}
+          </button>
+        </div>
 
         {/* Mobile / Tablet actions */}
         <div className="flex items-center gap-2 lg:hidden">
+          <button
+            onClick={toggleDarkMode}
+            title="Toggle theme"
+            aria-label="Toggle theme"
+            className="p-2 rounded-xl bg-white/5 text-teal-300 border border-white/10"
+          >
+            {isDarkMode ? <Sun className="h-4 w-4 text-amber-300" /> : <Moon className="h-4 w-4 text-teal-200" />}
+          </button>
+
           {unreadAlertCount > 0 && (
             <NavLink
               to="/alerts"
