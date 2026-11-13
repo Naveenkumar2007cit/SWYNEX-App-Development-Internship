@@ -10,6 +10,14 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'leaflet-vendor': ['leaflet', 'react-leaflet'],
+          'lucide-icons': ['lucide-react'],
+        }
+      }
+    }
   }
 })

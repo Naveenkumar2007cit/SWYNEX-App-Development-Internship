@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import {
   AlertTriangle,
   Info,
@@ -22,7 +23,7 @@ const severityConfig = {
   high:     { bg: "bg-rose-50/90",   border: "border-rose-200",   text: "text-rose-900",   icon: XCircle,       iconColor: "text-rose-600",    badge: "High Severity" },
 };
 
-export default function AlertCard({
+function AlertCard({
   alert,
   onDismiss,
   onToggleRead,
@@ -155,3 +156,5 @@ export default function AlertCard({
     </div>
   );
 }
+
+export default memo(AlertCard);
