@@ -93,3 +93,4 @@ console.log('✅ Save Route Test Passed');
 | `Leaflet map blank or tiles grey` | Leaflet CSS stylesheet not loaded | Verify internet connectivity to load OpenStreetMap tiles |
 | `Geolocation denied error` | Browser blocked location permission | Use the **"Chennai Transit Anchors"** buttons on `/nearby` as a direct fallback |
 | `Corrupted localStorage` | Malformed test string in browser storage | Clear browser cache or click **"Clear All"** on the Saved Routes page |
+

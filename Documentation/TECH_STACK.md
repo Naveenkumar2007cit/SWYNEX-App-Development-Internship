@@ -105,3 +105,4 @@ Implemented in [`journeyService.js`](file:///d:/SWYNEX%20App%20Development%20Int
 - **Pass 1:** Direct route query scanning route stops in order of travel.
 - **Pass 2:** 1-transfer interchange finding where `Stop A ➔ Intermediate Interchange Stop ➔ Stop B` using verified stop intersections.
 - Routes are filtered to ensure connectivity and sorted by duration, transfers, or distance.
+

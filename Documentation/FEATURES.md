@@ -63,3 +63,4 @@ This document provides a feature audit and technical breakdown of the **BusBridg
 - **Theme Mode:** Integrated Light Mode and Metro Dark Mode toggle with persistent `localStorage` preference.
 - **Accessibility:** WCAG AA compliant color contrast, prominent focus rings (`focus:ring-emerald-400`), and screen-reader accessible attributes.
 - **Mobile Thumb Zone:** Responsive bottom navigation bar with live notification badges and persistent **Nearby Radar FAB**.
+
