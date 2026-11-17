@@ -22,7 +22,7 @@ Claiming that municipal transit buses stop inside private campus grounds mislead
    - Frequent shared feeder autos and local mini-buses pick up students here.
    - Fare to Kundrathur Bus Stand: ₹15 per student.
 2. **Kundrathur Bus Stand (6.2 km):**
-   - The official municipal terminus where Route 66K originates from Platform 1.
+   - The official municipal terminus where Route 66K originates.
    - Boarding at Kundrathur Bus Stand guarantees students seating space and luggage accommodation before the bus enters crowded suburban stops.
 
 ---
@@ -33,12 +33,13 @@ Claiming that municipal transit buses stop inside private campus grounds mislead
 - **Origin:** Kundrathur Bus Stand
 - **Destination:** Kilambakkam Kalaignar Centenary Bus Terminus (KCBT)
 - **Distance:** ~28.5 km
-- **Average Run Time:** 65 to 80 minutes (depending on GST Road traffic)
+- **Estimated Run Time:** 65 to 80 minutes (indicative; subject to GST Road traffic)
 - **Fleet:** Standard Ordinary (white board / fare concessions) and Deluxe (MTC green/white liveries)
-- **Operating Fleet Size:** High frequency during morning (06:30 – 09:30) and evening peak hours (16:00 – 20:30).
+- **Operating Fleet:** Scheduled morning and evening peak trips across the corridor (daily dispatch governed by MTC depot management).
+- **Data Provenance:** MTC Route Master (Official alignment) & CMDA Kilambakkam Bus Terminal Layout.
 
 ### Official Stop Sequence Verified
-1. **Kundrathur Bus Stand (Terminus Platform 1)**
+1. **Kundrathur Bus Stand (Terminus)**
 2. Kundrathur Murugan Temple Arch
 3. Anakaputhur Amman Koil
 4. Pammal Main Road
@@ -50,7 +51,7 @@ Claiming that municipal transit buses stop inside private campus grounds mislead
 10. Perungalathur (Suburban Bus Bay)
 11. Vandalur Zoo (Arignar Anna Zoological Park)
 12. Kolapakkam / Urapakkam
-13. **Kilambakkam KCBT (Arrival Platform 10)**
+13. **Kilambakkam KCBT (MTC City Bus Zone)**
 
 ---
 

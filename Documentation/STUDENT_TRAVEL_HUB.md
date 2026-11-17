@@ -56,19 +56,21 @@ BusBridge strictly separates intra-city government city buses from intercity sta
 
 ## 3. Verified Route Options for CIT Kundrathur
 
-### Option 1: Direct MTC Route 66K (Recommended)
-- **Origin Terminus:** Kundrathur Bus Stand (Platform 1)
-- **Destination:** Kilambakkam KCBT (Platform 10)
-- **Travel Time:** ~75 minutes
-- **Frequency:** Every 25–35 minutes
+### Option 1: Direct MTC Route 66K (Kundrathur ⇄ Kilambakkam)
+- **Origin Terminus:** Kundrathur Bus Stand
+- **Destination:** Kilambakkam KCBT (MTC City Bus Platform Zone)
+- **Estimated Travel Time:** ~75 minutes (traffic dependent)
+- **Frequency Profile:** Frequent scheduled trips during morning and evening corridors (indicative schedule; subject to daily MTC dispatch)
 - **Operator:** MTC Government City Bus (Ordinary & Deluxe)
 - **Key Route Path:** Kundrathur B.S. ➔ Anakaputhur ➔ Pammal ➔ Pallavaram ➔ Chromepet ➔ TB Sanatorium ➔ Tambaram West ➔ Perungalathur ➔ Vandalur Zoo ➔ Kilambakkam KCBT.
-- **Campus Link:** 350m walk to Puthuper stop, board a local feeder auto (₹15, 12 mins) to Kundrathur Bus Stand.
+- **Campus Link:** 350m walk to Puthuper stop, local feeder auto connection to Kundrathur Bus Stand.
+- **Provenance:** MTC Route Catalog & CMDA KCBT Terminal Layout (Verified corridor; timings indicative).
 
 ### Option 2: High-Frequency Transfer via Tambaram West
 - **First Leg:** Board MTC Route 566 or shared feeder from Somangalam Road / Kundrathur to Tambaram West Bus Stand (~25 mins).
-- **Second Leg:** Transfer at Tambaram West to any south-bound GST Road shuttle (Route 70, G18, E18, 91R, 66K) departing every 3–5 minutes down GST Road to KCBT (~30 mins).
-- **Total Time:** ~65–75 minutes.
+- **Second Leg:** Transfer at Tambaram West to any south-bound GST Road shuttle (Route 70, G18, E18, 91R, 66K) departing continuously down GST Road to KCBT (~30 mins).
+- **Total Estimated Time:** ~65–75 minutes.
+- **Provenance:** Community Verified Transfer Corridor (Last verified: Nov 2026).
 
 ---
 

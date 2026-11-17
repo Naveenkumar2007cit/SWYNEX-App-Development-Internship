@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Compass,
   ArrowUpDown,
@@ -27,6 +28,7 @@ import MapView from "../components/MapView";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function JourneyPlanner() {
+  const [searchParams] = useSearchParams();
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [sourceSuggest, setSourceSuggest] = useState([]);
@@ -39,29 +41,37 @@ export default function JourneyPlanner() {
   const [selectedJourney, setSelectedJourney] = useState(null);
   const [sortCriteria, setSortCriteria] = useState("fastest");
   const [activeTab, setActiveTab] = useState("directions"); // 'directions' | 'map'
+  const initialUrlChecked = useRef(false);
 
   // Pre-load all available stops for autocomplete catalog
   const stopCatalog = useMemo(() => getAllStopsCatalog(), []);
   const stopNames = useMemo(() => stopCatalog.map((s) => s.name), [stopCatalog]);
 
-  const getSuggestions = (query) => {
+  const getSuggestions = (query, excludeStop = "") => {
     if (!query || query.trim().length < 2) return [];
     const q = query.toLowerCase().trim();
     return stopNames
-      .filter((name) => name.toLowerCase().includes(q))
+      .filter((name) => {
+        if (excludeStop && areStopsEqual(name, excludeStop)) return false;
+        return name.toLowerCase().includes(q);
+      })
       .slice(0, 7);
   };
 
   const handleSourceChange = (val) => {
     setSource(val);
     setValidationError("");
-    setSourceSuggest(getSuggestions(val));
+    setSourceSuggest(getSuggestions(val, destination));
+    if (val && destination && areStopsEqual(val, destination)) {
+      setDestination("");
+      setDestSuggest([]);
+    }
   };
 
   const handleDestChange = (val) => {
     setDestination(val);
     setValidationError("");
-    setDestSuggest(getSuggestions(val));
+    setDestSuggest(getSuggestions(val, source));
   };
 
   const handleSwap = () => {
@@ -71,25 +81,25 @@ export default function JourneyPlanner() {
     setValidationError("");
     setSourceSuggest([]);
     setDestSuggest([]);
-    if (searched && destination && temp) {
+    if (destination && temp && !areStopsEqual(destination, temp)) {
       executeSearch(destination, temp);
     }
   };
 
-  const validate = () => {
-    if (!source.trim() && !destination.trim()) {
+  const validate = (s = source, d = destination) => {
+    if (!s.trim() && !d.trim()) {
       setValidationError("Please select or enter both starting and destination stops.");
       return false;
     }
-    if (!source.trim()) {
+    if (!s.trim()) {
       setValidationError("Please enter your starting bus stop.");
       return false;
     }
-    if (!destination.trim()) {
+    if (!d.trim()) {
       setValidationError("Please enter your destination bus stop.");
       return false;
     }
-    if (areStopsEqual(source, destination)) {
+    if (areStopsEqual(s, d)) {
       setValidationError("Source and destination cannot be the same stop. Please select different stops.");
       return false;
     }
@@ -115,6 +125,23 @@ export default function JourneyPlanner() {
       setLoading(false);
     }, 350);
   };
+
+  // URL search params sync (e.g. from Home.jsx or StudentTravelHub.jsx)
+  useEffect(() => {
+    const sParam = searchParams.get("source") || searchParams.get("from") || "";
+    const dParam = searchParams.get("destination") || searchParams.get("to") || "";
+
+    if (sParam || dParam) {
+      if (sParam) setSource(sParam);
+      if (dParam) setDestination(dParam);
+
+      if (sParam.trim() && dParam.trim() && !areStopsEqual(sParam, dParam)) {
+        executeSearch(sParam, dParam);
+      } else if (sParam.trim() && dParam.trim() && areStopsEqual(sParam, dParam)) {
+        setValidationError("Source and destination cannot be the same stop. Please select different stops.");
+      }
+    }
+  }, [searchParams]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -172,7 +199,7 @@ export default function JourneyPlanner() {
                 type="text"
                 value={source}
                 onChange={(e) => handleSourceChange(e.target.value)}
-                onFocus={() => setSourceSuggest(getSuggestions(source))}
+                onFocus={() => setSourceSuggest(getSuggestions(source, destination))}
                 placeholder="Starting bus stop (e.g., Tambaram, Guindy, Koyambedu)"
                 className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-400"
               />
@@ -230,7 +257,7 @@ export default function JourneyPlanner() {
                 type="text"
                 value={destination}
                 onChange={(e) => handleDestChange(e.target.value)}
-                onFocus={() => setDestSuggest(getSuggestions(destination))}
+                onFocus={() => setDestSuggest(getSuggestions(destination, source))}
                 placeholder="Destination bus stop (e.g., Broadway, Adyar, Velachery)"
                 className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-400"
               />

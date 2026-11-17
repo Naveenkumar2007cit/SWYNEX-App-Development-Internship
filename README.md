@@ -48,9 +48,9 @@ Commuters navigating urban public bus transit in Chennai frequently encounter cr
 
 ### 1. Student Travel Hub – Chennai (`/student`) [NEW]
 - **College to Government Bus Journey Planner:** Designed for college students and hostelers traveling to major bus terminals (**Kilambakkam KCBT**, CMBT Koyambedu, Tambaram, Broadway) via official MTC buses.
-- **Priority Corridor:** Chennai Institute of Technology (CIT), Kundrathur ➔ Kilambakkam Kalaignar Centenary Bus Terminus (KCBT) featuring verified MTC Route 66K direct schedules and Tambaram West connection alternatives.
+- **Priority Corridor:** Chennai Institute of Technology (CIT), Kundrathur ➔ Kilambakkam Kalaignar Centenary Bus Terminus (KCBT) featuring MTC Route 66K direct connection and high-frequency Tambaram West transfer options.
 - **Two-Stage Transit Guidance:** Clear separation between Stage A (Intra-city MTC City Buses) and Stage B (Intercity TNSTC / SETC State Express Buses bookable via [www.tnstc.in](https://www.tnstc.in)).
-- **Searchable College Directory:** 7 initial colleges (CIT Kundrathur, CEG Guindy, MIT Chromepet, IIT Madras, VIT Chennai, IIITDM Kancheepuram, SRM Easwari) with walking directions, nearby verified boarding stops, and local feeder auto details.
+- **Searchable College Directory:** 7 initial colleges (CIT Kundrathur, CEG Guindy, MIT Chromepet, IIT Madras, VIT Chennai, IIITDM Kancheepuram, SRM Easwari) with walking directions, nearby verified boarding stops, local feeder auto details, and data provenance tags.
 - **Strict Government-Bus-Only Guarantee:** Excludes private buses and omnibuses to protect students from fare spikes.
 - **Festival & Weekend Travel Advisory:** Guidance for Pongal, Diwali, Semester breaks, and Friday evening rushes with official 149 helpline references.
 - **Beginner's Survival Guide (English & தமிழ்):** 5-step illustrated guide for freshers new to Chennai public transit.
@@ -58,18 +58,20 @@ Commuters navigating urban public bus transit in Chennai frequently encounter cr
 ### 2. Persistent Saved Routes (Core Feature Path)
 - **Offline-First Persistence:** Stored reliably in `localStorage` (`busbridge_saved_routes`) with corrupted data recovery and zero-backend dependency.
 - **Input & Route Validation:** Comprehensive checks ensuring valid sources, destinations, and bus details.
-- **Identical Stop Prevention:** Rejects journeys where starting stop and destination are identical.
+- **Identical Stop Prevention:** Rejects journeys where starting stop and destination are identical using `areStopsEqual()` across Home, Planner, and Saved Routes.
 - **Duplicate Prevention:** Matches candidate source, destination, and bus sequence; displays a clear warning toast if already saved.
 - **Complete Dashboard (`/saved`):** Search saved journeys, filter by Direct vs Transfer, and sort by Recent, Duration, or Stops.
 - **Safe Management:** 1-tap individual removal, plus confirmed modal for clearing all journeys.
 
-### 2. Smart Journey Planner (`/planner`)
-- Direct and 1-transfer connectivity across 40+ Chennai stops (Tambaram, Guindy, Koyambedu CMBT, Broadway, Adyar, Velachery, Saidapet, etc.).
-- Sort results by **Fastest Route**, **Fewest Transfers**, and **Shortest Distance**.
-- Interactive stop-by-stop visual timeline showing boarding, interchange, and arrival stops.
-- 1-tap **"Save Route"** directly from journey result cards.
+### 3. Smart Journey Planner (`/planner`)
+- **Direct & 1-Transfer Connectivity:** Evaluates route networks across 40+ Chennai stops (Tambaram, Guindy, Koyambedu CMBT, Broadway, Adyar, Velachery, Saidapet, etc.).
+- **URL Parameter Synchronization:** Automatically reads `?source=` and `?destination=` from URL query parameters (e.g., from Home page quick searches or Student Hub), populates the fields, excludes redundant matches, and triggers the search automatically when both parameters are valid.
+- **Mutual Autocomplete Filtering:** Selected source stop is dynamically excluded from destination suggestions and vice versa. Changing source automatically clears an identical destination.
+- **Sort & Inspection Options:** Sort results by **Fastest Route**, **Fewest Transfers**, and **Shortest Distance**.
+- **Interactive Timeline & Map:** Stop-by-stop visual timeline showing boarding, interchange, and arrival stops alongside an interactive Leaflet map.
+- **1-Tap Save:** 1-tap **"Save Route"** directly from journey result cards.
 
-### 3. Nearby Bus Stops & Haversine Geolocation Radar (`/nearby`)
+### 4. Nearby Bus Stops & Haversine Geolocation Radar (`/nearby`)
 - Privacy-first Geolocation: GPS coordinates are accessed only upon explicit user request and processed strictly in-browser.
 - Distance calculated via standard **Haversine formula** and formatted dynamically (`350 m` or `1.86 km`).
 - Interactive Leaflet map with pulsing user beacon and color-coded stop pins.

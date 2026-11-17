@@ -138,7 +138,7 @@ export default function StudentTravelHub() {
               College to Government Bus Terminus
             </h1>
             <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-              Plan safe, verified travel from your college or hostel to <span className="text-emerald-300 font-bold">Kilambakkam (KCBT)</span>, CMBT Koyambedu & major Chennai transit hubs via 100% official MTC government buses.
+              Plan safe, suburban transit from your college or hostel to <span className="text-emerald-300 font-bold">Kilambakkam (KCBT)</span>, CMBT Koyambedu & major Chennai transit hubs via official MTC government buses.
             </p>
           </div>
 
@@ -173,11 +173,11 @@ export default function StudentTravelHub() {
             <div className="flex items-center gap-2 text-emerald-200">
               <Sparkles className="h-4 w-4 text-emerald-400 flex-shrink-0" />
               <span>
-                <strong>CIT Kundrathur ⇄ Kilambakkam (KCBT)</strong> priority corridor active with verified Route 66K timings.
+                <strong>CIT Kundrathur ⇄ Kilambakkam (KCBT)</strong> corridor active with Route 66K connection and Tambaram transfer options.
               </span>
             </div>
             <span className="text-[11px] bg-emerald-900/60 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-              Hostel Weekend Special
+              Hostel Weekend Corridor
             </span>
           </div>
         )}
@@ -428,6 +428,14 @@ export default function StudentTravelHub() {
                     </span>
                   </div>
 
+                  {/* Provenance Tag */}
+                  {option.provenance && (
+                    <div className="mt-2.5 p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-[10px] text-slate-600 dark:text-slate-400 flex flex-wrap items-center justify-between gap-1 border border-slate-200/60 dark:border-slate-700/60">
+                      <span><strong>Provenance:</strong> {option.provenance.source}</span>
+                      <span className="font-medium">Verified: {option.provenance.lastVerifiedDate} ({option.provenance.type.replace('_', ' ')})</span>
+                    </div>
+                  )}
+
                   {/* Intermediate stops list */}
                   {option.intermediateStops && (
                     <div className="mt-3 pt-3 border-t border-slate-200/60 dark:border-slate-800">
@@ -493,6 +501,11 @@ export default function StudentTravelHub() {
                             {r}
                           </span>
                         ))}
+                      </div>
+                    )}
+                    {stop.provenance && (
+                      <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-700/40 text-[9px] text-slate-400">
+                        Source: {stop.provenance.source} · {stop.provenance.type.replace('_', ' ')}
                       </div>
                     )}
                   </div>

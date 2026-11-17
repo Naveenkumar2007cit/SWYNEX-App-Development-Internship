@@ -32,6 +32,7 @@ import {
   ALERTS_CHANGE_EVENT,
 } from "../services/alertService.js";
 import { nearbyStops, allStopNames } from "../data/demoRoutes.js";
+import { areStopsEqual } from "../services/journeyService.js";
 import AlertCard from "../components/AlertCard.jsx";
 
 export default function Home() {
@@ -44,13 +45,18 @@ export default function Home() {
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const fromBoxRef = useRef(null);
   const toBoxRef = useRef(null);
 
-  const getFilteredStops = (query) => {
-    if (!query || query.trim().length === 0) return allStopNames.slice(0, 5);
+  const getFilteredStops = (query, excludeStop = "") => {
+    let pool = allStopNames;
+    if (excludeStop && excludeStop.trim()) {
+      pool = pool.filter((s) => !areStopsEqual(s, excludeStop));
+    }
+    if (!query || query.trim().length === 0) return pool.slice(0, 6);
     const q = query.toLowerCase().trim();
-    return allStopNames.filter((s) => s.toLowerCase().includes(q)).slice(0, 6);
+    return pool.filter((s) => s.toLowerCase().includes(q)).slice(0, 6);
   };
 
   const [dismissedCount, setDismissedCount] = useState(0);
@@ -104,12 +110,23 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (from.trim() && to.trim()) {
-      navigate(`/planner?source=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}`);
+    setErrorMessage("");
+
+    if (!from.trim() || !to.trim()) {
+      setErrorMessage("Please select or enter both starting and destination stops.");
+      return;
     }
+
+    if (areStopsEqual(from, to)) {
+      setErrorMessage("Starting stop and destination cannot be the same stop. Please select different stops.");
+      return;
+    }
+
+    navigate(`/planner?source=${encodeURIComponent(from.trim())}&destination=${encodeURIComponent(to.trim())}`);
   };
 
   const handleSwapStops = () => {
+    setErrorMessage("");
     const temp = from;
     setFrom(to);
     setTo(temp);
@@ -154,24 +171,52 @@ export default function Home() {
           </p>
 
           <form onSubmit={handleSearch} className="space-y-2.5">
+            {/* Validation Error Banner */}
+            {errorMessage && (
+              <div className="p-3 rounded-2xl bg-rose-500/90 text-white text-xs font-bold flex items-center justify-between shadow-md animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setErrorMessage("")}
+                  className="text-xs hover:text-rose-200 font-bold px-1"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             {/* From Input with Autocomplete */}
-            <div ref={fromBoxRef} className="relative">
+            <div ref={fromBoxRef} className="relative z-20">
               <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
                 <div className="h-3.5 w-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0" />
                 <input
                   value={from}
                   onChange={(e) => {
-                    setFrom(e.target.value);
+                    const val = e.target.value;
+                    setFrom(val);
+                    setErrorMessage("");
+                    setShowFromSuggestions(true);
+                    if (val && to && areStopsEqual(val, to)) {
+                      setTo("");
+                    }
+                  }}
+                  onFocus={() => {
+                    setErrorMessage("");
                     setShowFromSuggestions(true);
                   }}
-                  onFocus={() => setShowFromSuggestions(true)}
                   placeholder="Starting stop (e.g., Tambaram, Guindy, Koyambedu)"
                   className="flex-1 text-slate-900 font-bold text-sm sm:text-base outline-none bg-transparent placeholder-slate-500"
                 />
                 {from && (
                   <button
                     type="button"
-                    onClick={() => setFrom("")}
+                    onClick={() => {
+                      setFrom("");
+                      setErrorMessage("");
+                    }}
                     className="min-h-[36px] min-w-[36px] flex items-center justify-center text-xs text-slate-400 hover:text-slate-700 font-bold px-1"
                   >
                     ✕
@@ -183,15 +228,19 @@ export default function Home() {
               {showFromSuggestions && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
                   <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Chennai Stops
+                    <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Starting Stops
                   </div>
-                  {getFilteredStops(from).map((stop) => (
+                  {getFilteredStops(from, to).map((stop) => (
                     <button
                       key={stop}
                       type="button"
                       onClick={() => {
                         setFrom(stop);
+                        setErrorMessage("");
                         setShowFromSuggestions(false);
+                        if (to && areStopsEqual(stop, to)) {
+                          setTo("");
+                        }
                       }}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors flex items-center justify-between"
                     >
@@ -217,23 +266,30 @@ export default function Home() {
             </div>
 
             {/* To Input with Autocomplete */}
-            <div ref={toBoxRef} className="relative">
+            <div ref={toBoxRef} className="relative z-10">
               <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
                 <div className="h-3.5 w-3.5 rounded-full bg-rose-500 ring-4 ring-rose-100 flex-shrink-0" />
                 <input
                   value={to}
                   onChange={(e) => {
                     setTo(e.target.value);
+                    setErrorMessage("");
                     setShowToSuggestions(true);
                   }}
-                  onFocus={() => setShowToSuggestions(true)}
+                  onFocus={() => {
+                    setErrorMessage("");
+                    setShowToSuggestions(true);
+                  }}
                   placeholder="Destination stop (e.g., Broadway, Adyar, Velachery)"
                   className="flex-1 text-slate-900 font-bold text-sm sm:text-base outline-none bg-transparent placeholder-slate-500"
                 />
                 {to && (
                   <button
                     type="button"
-                    onClick={() => setTo("")}
+                    onClick={() => {
+                      setTo("");
+                      setErrorMessage("");
+                    }}
                     className="min-h-[36px] min-w-[36px] flex items-center justify-center text-xs text-slate-400 hover:text-slate-700 font-bold px-1"
                   >
                     ✕
@@ -245,14 +301,15 @@ export default function Home() {
               {showToSuggestions && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
                   <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Chennai Stops
+                    <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Destination Stops
                   </div>
-                  {getFilteredStops(to).map((stop) => (
+                  {getFilteredStops(to, from).map((stop) => (
                     <button
                       key={stop}
                       type="button"
                       onClick={() => {
                         setTo(stop);
+                        setErrorMessage("");
                         setShowToSuggestions(false);
                       }}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors flex items-center justify-between"
@@ -302,7 +359,7 @@ export default function Home() {
               Student Travel Hub · Chennai
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Traveling home for the weekend or festival? Plan verified college-to-government bus routes with Route 66K timings, KCBT bay guides, and fresher tips.
+              Traveling home for the weekend or festival? Plan college-to-government bus routes with Route 66K transit links, KCBT bay guides, and fresher tips.
             </p>
           </div>
           <button
