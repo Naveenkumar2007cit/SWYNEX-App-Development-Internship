@@ -259,8 +259,12 @@ export async function getCrowdReports(routeIdentifier) {
   if (supabase) {
     try {
       let query = supabase.from("crowd_reports").select("*").order("reported_at", { ascending: false });
-      if (routeIdentifier) {
-        query = query.or(`route_id.ilike.%${routeIdentifier}%,bus_number.ilike.%${routeIdentifier}%`);
+      if (routeIdentifier && typeof routeIdentifier === "string") {
+        // Sanitize route identifier to alphanumeric and safe characters to prevent PostgREST injection
+        const cleanId = routeIdentifier.replace(/[^a-zA-Z0-9_\-\s]/g, "").trim();
+        if (cleanId) {
+          query = query.or(`route_id.ilike.%${cleanId}%,bus_number.ilike.%${cleanId}%`);
+        }
       }
       const { data, error } = await query;
       if (error) {

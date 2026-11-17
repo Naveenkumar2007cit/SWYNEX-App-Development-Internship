@@ -131,7 +131,8 @@ Commuters navigating urban public bus transit in Chennai frequently encounter cr
 | **Styling** | Tailwind CSS 3.4.14 (with custom `mtc` color tokens & `darkMode: 'class'`) |
 | **Mapping & Geospatial** | Leaflet 1.9.4 & React-Leaflet 4.2.1 |
 | **Iconography** | Lucide React 0.453.0 |
-| **Storage Architecture** | Synchronous `localStorage` with error handling & custom DOM events |
+| **Cloud Backend & Database** | Supabase JS 2.45.4 (PostgreSQL 15+, Row-Level Security, anonymous sessions) |
+| **Storage Architecture** | Dual persistence: Supabase PostgreSQL cloud sync with resilient offline-first `localStorage` fallback |
 
 ---
 
@@ -196,14 +197,16 @@ npm run preview
 
 ## 💾 Data Storage & State Architecture
 
-BusBridge uses a resilient, offline-first client-side architecture powered by browser `localStorage`:
-- `busbridge_saved_routes`: Array of user-saved direct & transfer journeys with timestamps.
-- `busbridge_service_alerts`: Active and archived transit notices.
-- `busbridge_read_notifications`: Set of notification IDs marked as read.
-- `busbridge_crowd_reports`: Crowd reports with rate-limiting timestamp cooldowns.
-- `busbridge_reported_issues`: Passenger grievance history and ticket statuses.
-- `busbridge_recent_searches`: Recent search pairs for 1-tap replay.
-- `busbridge_theme`: Persistent visual mode selection (`"light"` or `"dark"`).
+BusBridge employs a dual-tier storage architecture designed for resilience, security, and offline support:
+- **Cloud Backend (Supabase PostgreSQL)**: Synchronizes saved corridors (`saved_routes`), community crowd status (`crowd_reports`), and passenger grievance tickets (`issue_reports`) with Row-Level Security (RLS) isolating user records via anonymous/authenticated sessions.
+- **Offline-First Client Fallback (`localStorage`)**: In offline environments or if cloud credentials are absent, BusBridge gracefully continues operations in standalone local mode:
+  - `busbridge_saved_routes`: Array of user-saved direct & transfer journeys with timestamps.
+  - `busbridge_service_alerts`: Active and archived transit notices.
+  - `busbridge_read_notifications`: Set of notification IDs marked as read.
+  - `busbridge_crowd_reports`: Crowd reports with rate-limiting timestamp cooldowns.
+  - `busbridge_reported_issues`: Passenger grievance history and ticket statuses.
+  - `busbridge_recent_searches`: Recent search pairs for 1-tap replay.
+  - `busbridge_theme`: Persistent visual mode selection (`"light"` or `"dark"`).
 
 Cross-component updates are synchronized reactively via custom DOM events (`busbridge_saved_routes_changed` and `busbridge_notifications_changed`).
 
@@ -212,7 +215,7 @@ Cross-component updates are synchronized reactively via custom DOM events (`busb
 ## 🧪 Testing & Verification
 
 1. **Automated Test Suite:** Evaluated storage validation, duplicate prevention, item deletion, and clear-all operations using an automated headless runner.
-2. **Production Build:** Vite production build compiles 1651 modules with 0 errors in ~5.40s.
+2. **Production Build:** Vite production build compiles 1660 modules with 0 errors in ~5.20s.
 3. **Cross-Device Testing:** Verified on mobile (360px), tablet (768px), and desktop (1280px+) viewport breakpoints.
 4. **Demonstration Guide:** Step-by-step instructions available in [`Documentation/DEMO.md`](Documentation/DEMO.md).
 

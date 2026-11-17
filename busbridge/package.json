@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "BusBridge – Public Bus Information Gap Solver | SWYNEX Internship Task 2",
+  "description": "BusBridge – Public Bus Information Gap Solver | SWYNEX Internship Task 4 Final App Project",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

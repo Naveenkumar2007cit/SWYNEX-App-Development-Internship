@@ -1,4 +1,4 @@
-import supabase from "./supabaseClient.js";
+import supabase, { ensureAnonymousSession } from "./supabaseClient.js";
 
 const STORAGE_KEY = "busbridge_saved_routes";
 export const SAVED_ROUTES_CHANGE_EVENT = "busbridge_saved_routes_changed";
@@ -227,8 +227,10 @@ export async function saveRoute(routeOrJourney) {
   let cloudSaved = false;
   if (supabase) {
     try {
+      const uid = await ensureAnonymousSession();
       const payload = {
         id: item.id,
+        user_id: uid,
         route_id: item.id,
         bus_number: item.busNumber || null,
         name: item.name || null,
@@ -274,11 +276,22 @@ export async function unsaveRoute(routeId) {
     return { success: false, message: "Route ID required to remove." };
   }
 
+  let cloudDeleted = false;
   if (supabase) {
     try {
-      await supabase.from("saved_routes").delete().eq("route_id", routeId);
-    } catch (_err) {
-      // Fallback gracefully to local storage
+      const uid = await ensureAnonymousSession();
+      let query = supabase.from("saved_routes").delete().eq("id", routeId);
+      if (uid) {
+        query = query.eq("user_id", uid);
+      }
+      const { error } = await query;
+      if (error) {
+        console.warn("Supabase unsaveRoute deletion returned error:", error.message);
+      } else {
+        cloudDeleted = true;
+      }
+    } catch (err) {
+      console.warn("Supabase unsaveRoute network error:", err.message);
     }
   }
 
@@ -288,16 +301,30 @@ export async function unsaveRoute(routeId) {
   setLocalSaved(updated);
 
   const busInfo = removed?.busNumber ? `Bus ${removed.busNumber}` : "Journey";
+  const note = cloudDeleted ? " (synced to cloud)" : "";
   return {
     success: true,
-    message: `${busInfo} removed from saved routes.`,
+    cloudDeleted,
+    message: `${busInfo} removed from saved routes.${note}`,
   };
 }
 
 /**
  * Clear all saved journeys with immediate reactive update
  */
-export function clearAllSavedRoutes() {
+export async function clearAllSavedRoutes() {
+  if (supabase) {
+    try {
+      const uid = await ensureAnonymousSession();
+      if (uid) {
+        const { error } = await supabase.from("saved_routes").delete().eq("user_id", uid);
+        if (error) console.warn("Supabase clearAllSavedRoutes error:", error.message);
+      }
+    } catch (err) {
+      console.warn("Supabase clearAllSavedRoutes network error:", err.message);
+    }
+  }
+
   if (typeof window !== "undefined" && window.localStorage) {
     localStorage.removeItem(STORAGE_KEY);
     notifyChange();
@@ -311,10 +338,12 @@ export function clearAllSavedRoutes() {
 export async function getSavedRoutes() {
   if (supabase) {
     try {
-      const { data, error } = await supabase
-        .from("saved_routes")
-        .select("*")
-        .order("saved_at", { ascending: false });
+      const uid = await ensureAnonymousSession();
+      let query = supabase.from("saved_routes").select("*").order("saved_at", { ascending: false });
+      if (uid) {
+        query = query.eq("user_id", uid);
+      }
+      const { data, error } = await query;
 
       if (error) {
         console.warn("Supabase saved_routes fetch failed; fallback to local storage:", error.message);

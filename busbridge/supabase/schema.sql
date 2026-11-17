@@ -192,25 +192,21 @@ create policy "Anyone can submit issue reports"
   );
 
 -- Saved Routes:
--- When authentication is present, restrict to user's own rows.
--- When unauthenticated (auth.uid() is null), disallow anonymous cross-tenant snooping.
+-- Enforces true user isolation via auth.uid() (works with both Supabase Auth and Anonymous Auth).
 create policy "Users can read their own saved routes"
   on public.saved_routes for select
   using (
-    (auth.uid() is not null and user_id = auth.uid()) or
-    (auth.uid() is null and user_id is null)
+    auth.uid() is not null and user_id = auth.uid()
   );
 
 create policy "Users can insert their own saved routes"
   on public.saved_routes for insert
   with check (
-    (auth.uid() is not null and user_id = auth.uid()) or
-    (auth.uid() is null and user_id is null)
+    auth.uid() is not null and user_id = auth.uid()
   );
 
 create policy "Users can delete their own saved routes"
   on public.saved_routes for delete
   using (
-    (auth.uid() is not null and user_id = auth.uid()) or
-    (auth.uid() is null and user_id is null)
+    auth.uid() is not null and user_id = auth.uid()
   );
