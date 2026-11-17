@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Bus, Search, Compass, Users, AlertOctagon, Bookmark, Bell, Navigation, Menu, X, Sun, Moon } from "lucide-react";
+import { Bus, Search, Compass, Users, AlertOctagon, Bookmark, Bell, Navigation, Menu, X, Sun, Moon, GraduationCap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getLocalSaved, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService.js";
 import { getStoredAlerts, getReadNotificationIds, NOTIFICATIONS_CHANGE_EVENT } from "../services/alertService.js";
 
 const navItems = [
   { to: "/",             icon: Bus,           label: "Home" },
+  { to: "/student",      icon: GraduationCap, label: "Student Hub", badge: "CIT" },
   { to: "/planner",      icon: Compass,       label: "Planner" },
   { to: "/nearby",       icon: Navigation,    label: "Nearby" },
   { to: "/search",       icon: Search,        label: "Search" },
@@ -85,7 +86,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-3">
           <nav className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm p-1.5 rounded-2xl border border-white/10">
-            {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
+            {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge, badge }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -100,6 +101,12 @@ export default function Navbar() {
               >
                 <Icon className="h-4 w-4" />
                 <span>{label}</span>
+
+                {badge && (
+                  <span className="bg-emerald-400 text-navy-950 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-tighter">
+                    {badge}
+                  </span>
+                )}
 
                 {hasSavedBadge && savedCount > 0 && (
                   <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-xs">
@@ -161,7 +168,7 @@ export default function Navbar() {
       {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="lg:hidden backdrop-blur-xl bg-navy-950/95 border-t border-white/10 px-4 pb-4 animate-fadeIn">
-          {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
+          {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge, badge }) => (
             <NavLink
               key={to}
               to={to}
@@ -176,6 +183,12 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <Icon className="h-4 w-4" />
                 <span>{label}</span>
+
+                {badge && (
+                  <span className="bg-emerald-400 text-navy-950 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-tighter">
+                    {badge}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1.5">
                 {hasSavedBadge && savedCount > 0 && (

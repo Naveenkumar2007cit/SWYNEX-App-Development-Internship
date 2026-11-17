@@ -13,6 +13,7 @@ const RouteDetails   = lazy(() => import("./pages/RouteDetails.jsx"));
 const CrowdStatus    = lazy(() => import("./pages/CrowdStatus.jsx"));
 const ReportIssue    = lazy(() => import("./pages/ReportIssue.jsx"));
 const SavedRoutes    = lazy(() => import("./pages/SavedRoutes.jsx"));
+const StudentTravelHub = lazy(() => import("./pages/StudentTravelHub.jsx"));
 const NotFound       = lazy(() => import("./pages/NotFound.jsx"));
 
 function PageLoader() {
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/crowd"      element={<CrowdStatus />} />
               <Route path="/report"     element={<ReportIssue />} />
               <Route path="/saved"      element={<SavedRoutes />} />
+              <Route path="/student"    element={<StudentTravelHub />} />
               <Route path="*"           element={<NotFound />} />
             </Routes>
           </Suspense>

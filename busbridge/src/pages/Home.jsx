@@ -18,6 +18,7 @@ import {
   Users,
   Check,
   Radio,
+  GraduationCap,
 } from "lucide-react";
 import { getRecentSearches } from "../services/routeService.js";
 import { getSavedRoutes, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService.js";
@@ -284,6 +285,34 @@ export default function Home() {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      {/* Student Travel Hub Spotlight Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 via-teal-900 to-navy-950 text-white p-5 sm:p-6 shadow-lg border border-emerald-500/20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-400 text-navy-950 flex items-center gap-1">
+                <GraduationCap className="h-3 w-3" /> New Feature
+              </span>
+              <span className="text-xs text-emerald-300 font-bold">CIT Kundrathur ⇄ Kilambakkam (KCBT)</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-black text-white">
+              Student Travel Hub · Chennai
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+              Traveling home for the weekend or festival? Plan verified college-to-government bus routes with Route 66K timings, KCBT bay guides, and fresher tips.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/student")}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-navy-950 font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 flex-shrink-0"
+          >
+            Open Student Hub
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
 

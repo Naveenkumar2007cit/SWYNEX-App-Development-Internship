@@ -1,15 +1,16 @@
 import { NavLink } from "react-router-dom";
-import { Bus, Compass, Navigation, Search, Bell, Bookmark } from "lucide-react";
+import { Bus, Compass, Navigation, Search, Bell, Bookmark, GraduationCap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getLocalSaved, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService.js";
 import { getStoredAlerts, getReadNotificationIds, NOTIFICATIONS_CHANGE_EVENT } from "../services/alertService.js";
 
 const navItems = [
-  { to: "/",        icon: Bus,        label: "Home" },
-  { to: "/planner", icon: Compass,    label: "Planner" },
-  { to: "/nearby",  icon: Navigation, label: "Nearby" },
-  { to: "/alerts",  icon: Bell,       label: "Alerts", hasAlertBadge: true },
-  { to: "/saved",   icon: Bookmark,   label: "Saved", hasSavedBadge: true },
+  { to: "/",        icon: Bus,           label: "Home" },
+  { to: "/student", icon: GraduationCap, label: "Student" },
+  { to: "/planner", icon: Compass,       label: "Planner" },
+  { to: "/nearby",  icon: Navigation,    label: "Nearby" },
+  { to: "/alerts",  icon: Bell,          label: "Alerts", hasAlertBadge: true },
+  { to: "/saved",   icon: Bookmark,      label: "Saved", hasSavedBadge: true },
 ];
 
 export default function BottomNavigation() {

@@ -46,7 +46,16 @@ Commuters navigating urban public bus transit in Chennai frequently encounter cr
 
 ## ✨ Features Actually Implemented
 
-### 1. Persistent Saved Routes (Core Feature Path)
+### 1. Student Travel Hub – Chennai (`/student`) [NEW]
+- **College to Government Bus Journey Planner:** Designed for college students and hostelers traveling to major bus terminals (**Kilambakkam KCBT**, CMBT Koyambedu, Tambaram, Broadway) via official MTC buses.
+- **Priority Corridor:** Chennai Institute of Technology (CIT), Kundrathur ➔ Kilambakkam Kalaignar Centenary Bus Terminus (KCBT) featuring verified MTC Route 66K direct schedules and Tambaram West connection alternatives.
+- **Two-Stage Transit Guidance:** Clear separation between Stage A (Intra-city MTC City Buses) and Stage B (Intercity TNSTC / SETC State Express Buses bookable via [www.tnstc.in](https://www.tnstc.in)).
+- **Searchable College Directory:** 7 initial colleges (CIT Kundrathur, CEG Guindy, MIT Chromepet, IIT Madras, VIT Chennai, IIITDM Kancheepuram, SRM Easwari) with walking directions, nearby verified boarding stops, and local feeder auto details.
+- **Strict Government-Bus-Only Guarantee:** Excludes private buses and omnibuses to protect students from fare spikes.
+- **Festival & Weekend Travel Advisory:** Guidance for Pongal, Diwali, Semester breaks, and Friday evening rushes with official 149 helpline references.
+- **Beginner's Survival Guide (English & தமிழ்):** 5-step illustrated guide for freshers new to Chennai public transit.
+
+### 2. Persistent Saved Routes (Core Feature Path)
 - **Offline-First Persistence:** Stored reliably in `localStorage` (`busbridge_saved_routes`) with corrupted data recovery and zero-backend dependency.
 - **Input & Route Validation:** Comprehensive checks ensuring valid sources, destinations, and bus details.
 - **Identical Stop Prevention:** Rejects journeys where starting stop and destination are identical.
