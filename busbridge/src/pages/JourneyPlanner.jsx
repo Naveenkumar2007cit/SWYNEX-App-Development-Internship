@@ -60,31 +60,46 @@ export default function JourneyPlanner() {
 
   const handleSourceChange = (val) => {
     setSource(val);
-    setValidationError("");
     setSourceSuggest(getSuggestions(val, destination));
-    if (val && destination && areStopsEqual(val, destination)) {
-      setDestination("");
-      setDestSuggest([]);
+    if (val.trim() && destination.trim() && val.trim().toLowerCase() === destination.trim().toLowerCase()) {
+      setValidationError("Starting point and destination cannot be the same.");
+    } else {
+      setValidationError("");
     }
   };
 
   const handleDestChange = (val) => {
     setDestination(val);
-    setValidationError("");
     setDestSuggest(getSuggestions(val, source));
+    if (source.trim() && val.trim() && source.trim().toLowerCase() === val.trim().toLowerCase()) {
+      setValidationError("Starting point and destination cannot be the same.");
+    } else {
+      setValidationError("");
+    }
   };
 
   const handleSwap = () => {
-    const temp = source;
-    setSource(destination);
-    setDestination(temp);
-    setValidationError("");
+    const nextSource = destination;
+    const nextDest = source;
+    setSource(nextSource);
+    setDestination(nextDest);
     setSourceSuggest([]);
     setDestSuggest([]);
-    if (destination && temp && !areStopsEqual(destination, temp)) {
-      executeSearch(destination, temp);
+
+    if (nextSource.trim() && nextDest.trim() && nextSource.trim().toLowerCase() === nextDest.trim().toLowerCase()) {
+      setValidationError("Starting point and destination cannot be the same.");
+    } else {
+      setValidationError("");
+      if (nextSource.trim() && nextDest.trim()) {
+        executeSearch(nextSource, nextDest);
+      }
     }
   };
+
+  const isSameStop = Boolean(
+    source.trim() && destination.trim() && source.trim().toLowerCase() === destination.trim().toLowerCase()
+  );
+  const isSearchDisabled = loading || !source.trim() || !destination.trim() || isSameStop;
 
   const validate = (s = source, d = destination) => {
     if (!s.trim() && !d.trim()) {
@@ -99,8 +114,8 @@ export default function JourneyPlanner() {
       setValidationError("Please enter your destination bus stop.");
       return false;
     }
-    if (areStopsEqual(s, d)) {
-      setValidationError("Source and destination cannot be the same stop. Please select different stops.");
+    if (s.trim().toLowerCase() === d.trim().toLowerCase()) {
+      setValidationError("Starting point and destination cannot be the same.");
       return false;
     }
     setValidationError("");
@@ -135,10 +150,10 @@ export default function JourneyPlanner() {
       if (sParam) setSource(sParam);
       if (dParam) setDestination(dParam);
 
-      if (sParam.trim() && dParam.trim() && !areStopsEqual(sParam, dParam)) {
+      if (sParam.trim() && dParam.trim() && sParam.trim().toLowerCase() !== dParam.trim().toLowerCase()) {
         executeSearch(sParam, dParam);
-      } else if (sParam.trim() && dParam.trim() && areStopsEqual(sParam, dParam)) {
-        setValidationError("Source and destination cannot be the same stop. Please select different stops.");
+      } else if (sParam.trim() && dParam.trim() && sParam.trim().toLowerCase() === dParam.trim().toLowerCase()) {
+        setValidationError("Starting point and destination cannot be the same.");
       }
     }
   }, [searchParams]);
@@ -224,7 +239,7 @@ export default function JourneyPlanner() {
                     key={name}
                     type="button"
                     onMouseDown={() => {
-                      setSource(name);
+                      handleSourceChange(name);
                       setSourceSuggest([]);
                     }}
                     className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-800 flex items-center gap-2 transition-colors"
@@ -282,7 +297,7 @@ export default function JourneyPlanner() {
                     key={name}
                     type="button"
                     onMouseDown={() => {
-                      setDestination(name);
+                      handleDestChange(name);
                       setDestSuggest([]);
                     }}
                     className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-gray-700 hover:bg-navy-50 hover:text-navy-900 flex items-center gap-2 transition-colors"
@@ -306,8 +321,8 @@ export default function JourneyPlanner() {
           {/* Search Button */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] text-sm sm:text-base"
+            disabled={isSearchDisabled}
+            className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] text-sm sm:text-base disabled:cursor-not-allowed"
           >
             <Search className="h-4 w-4" />
             {loading ? "Calculating Journey Options..." : "Find Best Journeys"}

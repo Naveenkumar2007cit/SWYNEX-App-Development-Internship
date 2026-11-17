@@ -183,6 +183,17 @@ export default function StudentTravelHub() {
         )}
       </div>
 
+      {/* Official Data Notice & Timetable Disclaimer Banner */}
+      <div className="rounded-2xl p-4 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs space-y-1.5 shadow-sm">
+        <div className="flex items-center gap-2 font-bold text-amber-950 dark:text-amber-100">
+          <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+          <span>Student Advisory &amp; Route Data Notice</span>
+        </div>
+        <p className="leading-relaxed opacity-95">
+          Bus route details, frequencies, and travel times in this demo represent sample or estimated transit corridors. Municipal bus timings and frequencies are subject to on-road traffic and MTC dispatch adjustments. Terminal platform and bay assignments at KCBT Kilambakkam must be confirmed via official station announcement boards or inquiry desks. Route 66K and connected services are shown for planning assistance and must not be treated as officially verified live schedules without checking current official MTC notices.
+        </p>
+      </div>
+
       {/* Save Success Alert Notification */}
       {saveSuccessMsg && (
         <div className="p-3.5 rounded-2xl bg-emerald-500 text-white font-bold text-xs flex items-center justify-between shadow-lg animate-fadeIn">
@@ -549,9 +560,9 @@ export default function StudentTravelHub() {
           <div className="p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 text-xs text-blue-900 dark:text-blue-300 leading-relaxed">
             <strong>Important Difference for Students:</strong>
             <ul className="list-disc list-inside mt-1 space-y-1 text-slate-600 dark:text-slate-300">
-              <li><strong>MTC City Buses:</strong> Connect CIT/colleges to KCBT ({kilambakkamGuide.mtcPlatformZone.platforms}). Regular tickets bought on board.</li>
-              <li><strong>TNSTC / SETC Government Buses:</strong> Intercity buses to Madurai, Trichy, Coimbatore, Salem, Tirunelveli, Kanyakumari. Depart from internal finger bays.</li>
-              <li><strong>Official Enquiry Helpline:</strong> Call <strong>{kilambakkamGuide.helpline}</strong>.</li>
+              <li><strong>MTC City Buses:</strong> Connect CIT/colleges to KCBT ({kilambakkamGuide.mtcPlatformZone.platforms}). Regular tickets bought on board. Exact bay allocations vary based on daily traffic control.</li>
+              <li><strong>TNSTC / SETC Government Buses:</strong> Intercity buses to Madurai, Trichy, Coimbatore, Salem, Tirunelveli, Kanyakumari. Depart from internal finger bays. Confirm boarding platform through terminal audio announcements and display screens.</li>
+              <li><strong>Official Enquiry Helpline:</strong> Call <strong>{kilambakkamGuide.helpline}</strong> for official operational updates.</li>
             </ul>
           </div>
 

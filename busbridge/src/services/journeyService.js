@@ -9,13 +9,13 @@ export function normalizeStopName(name) {
 }
 
 /**
- * Check if two stop names refer to the same stop (exact or high substring match)
+ * Check if two stop names refer to the same stop (normalized exact comparison)
  */
 export function areStopsEqual(a, b) {
-  const normA = normalizeStopName(a);
-  const normB = normalizeStopName(b);
+  const normA = (a || "").trim().toLowerCase();
+  const normB = (b || "").trim().toLowerCase();
   if (!normA || !normB) return false;
-  return normA === normB || normA.includes(normB) || normB.includes(normA);
+  return normA === normB;
 }
 
 /**

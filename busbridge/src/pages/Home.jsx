@@ -108,28 +108,57 @@ export default function Home() {
     };
   }, []);
 
+  const handleFromChange = (val) => {
+    setFrom(val);
+    setShowFromSuggestions(true);
+    if (val.trim() && to.trim() && val.trim().toLowerCase() === to.trim().toLowerCase()) {
+      setErrorMessage("Starting point and destination cannot be the same.");
+    } else {
+      setErrorMessage("");
+    }
+  };
+
+  const handleToChange = (val) => {
+    setTo(val);
+    setShowToSuggestions(true);
+    if (from.trim() && val.trim() && from.trim().toLowerCase() === val.trim().toLowerCase()) {
+      setErrorMessage("Starting point and destination cannot be the same.");
+    } else {
+      setErrorMessage("");
+    }
+  };
+
+  const handleSwapStops = () => {
+    const nextFrom = to;
+    const nextTo = from;
+    setFrom(nextFrom);
+    setTo(nextTo);
+    if (nextFrom.trim() && nextTo.trim() && nextFrom.trim().toLowerCase() === nextTo.trim().toLowerCase()) {
+      setErrorMessage("Starting point and destination cannot be the same.");
+    } else {
+      setErrorMessage("");
+    }
+  };
+
+  const isSameStop = Boolean(
+    from.trim() && to.trim() && from.trim().toLowerCase() === to.trim().toLowerCase()
+  );
+  const isSearchDisabled = !from.trim() || !to.trim() || isSameStop;
+
   const handleSearch = (e) => {
     e.preventDefault();
-    setErrorMessage("");
-
     if (!from.trim() || !to.trim()) {
       setErrorMessage("Please select or enter both starting and destination stops.");
       return;
     }
 
-    if (areStopsEqual(from, to)) {
-      setErrorMessage("Starting stop and destination cannot be the same stop. Please select different stops.");
+    if (from.trim().toLowerCase() === to.trim().toLowerCase()) {
+      setErrorMessage("Starting point and destination cannot be the same.");
       return;
     }
 
-    navigate(`/planner?source=${encodeURIComponent(from.trim())}&destination=${encodeURIComponent(to.trim())}`);
-  };
-
-  const handleSwapStops = () => {
     setErrorMessage("");
-    const temp = from;
-    setFrom(to);
-    setTo(temp);
+    navigate(`/planner?source=${encodeURIComponent(from.trim())}&destination=${encodeURIComponent(to.trim())}`);
   };
 
   const quickLinks = [
@@ -194,17 +223,11 @@ export default function Home() {
                 <div className="h-3.5 w-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0" />
                 <input
                   value={from}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFrom(val);
-                    setErrorMessage("");
-                    setShowFromSuggestions(true);
-                    if (val && to && areStopsEqual(val, to)) {
-                      setTo("");
-                    }
-                  }}
+                  onChange={(e) => handleFromChange(e.target.value)}
                   onFocus={() => {
-                    setErrorMessage("");
+                    if (isSameStop) {
+                      setErrorMessage("Starting point and destination cannot be the same.");
+                    }
                     setShowFromSuggestions(true);
                   }}
                   placeholder="Starting stop (e.g., Tambaram, Guindy, Koyambedu)"
@@ -235,12 +258,8 @@ export default function Home() {
                       key={stop}
                       type="button"
                       onClick={() => {
-                        setFrom(stop);
-                        setErrorMessage("");
+                        handleFromChange(stop);
                         setShowFromSuggestions(false);
-                        if (to && areStopsEqual(stop, to)) {
-                          setTo("");
-                        }
                       }}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors flex items-center justify-between"
                     >
@@ -271,13 +290,11 @@ export default function Home() {
                 <div className="h-3.5 w-3.5 rounded-full bg-rose-500 ring-4 ring-rose-100 flex-shrink-0" />
                 <input
                   value={to}
-                  onChange={(e) => {
-                    setTo(e.target.value);
-                    setErrorMessage("");
-                    setShowToSuggestions(true);
-                  }}
+                  onChange={(e) => handleToChange(e.target.value)}
                   onFocus={() => {
-                    setErrorMessage("");
+                    if (isSameStop) {
+                      setErrorMessage("Starting point and destination cannot be the same.");
+                    }
                     setShowToSuggestions(true);
                   }}
                   placeholder="Destination stop (e.g., Broadway, Adyar, Velachery)"
@@ -308,8 +325,7 @@ export default function Home() {
                       key={stop}
                       type="button"
                       onClick={() => {
-                        setTo(stop);
-                        setErrorMessage("");
+                        handleToChange(stop);
                         setShowToSuggestions(false);
                       }}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors flex items-center justify-between"
@@ -326,7 +342,7 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 type="submit"
-                disabled={!from.trim() || !to.trim()}
+                disabled={isSearchDisabled}
                 className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-900/30 text-xs sm:text-sm active:scale-95"
               >
                 <Compass className="h-4 w-4" />
