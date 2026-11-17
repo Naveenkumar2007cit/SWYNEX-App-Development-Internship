@@ -363,8 +363,8 @@ export default function JourneyPlanner() {
               </h3>
               <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
                 No direct bus or verified 1-transfer connection was found between{" "}
-                <span className="font-medium text-gray-800">"{source}"</span> and{" "}
-                <span className="font-medium text-gray-800">"{destination}"</span> in the demo dataset.
+                <span className="font-medium text-gray-800">&ldquo;{source}&rdquo;</span> and{" "}
+                <span className="font-medium text-gray-800">&ldquo;{destination}&rdquo;</span> in the demo dataset.
               </p>
               <div className="pt-2 text-xs text-gray-400">
                 Tip: Try selecting major hubs such as Guindy, T. Nagar, CMBT Koyambedu, or Broadway.

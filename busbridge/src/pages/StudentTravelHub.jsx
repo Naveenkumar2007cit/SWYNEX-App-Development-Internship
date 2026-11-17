@@ -243,7 +243,7 @@ export default function StudentTravelHub() {
           }`}
         >
           <BookOpen className="h-4 w-4 text-emerald-400" />
-          Beginner's Guide (Freshers)
+          Beginner&apos;s Guide (Freshers)
         </button>
       </div>
 
@@ -524,7 +524,7 @@ export default function StudentTravelHub() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">
-                Tamil Nadu's Largest Bus Port
+                Tamil Nadu&apos;s Largest Bus Port
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                 {kilambakkamGuide.terminalName} ({kilambakkamGuide.shortCode})
@@ -668,7 +668,7 @@ export default function StudentTravelHub() {
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 shadow-lg border border-slate-100 dark:border-slate-800 space-y-6">
           <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              MTC Bus Beginner's Guide for College Students
+              MTC Bus Beginner&apos;s Guide for College Students
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               New to Chennai? Essential survival steps for navigating MTC buses and reaching your bus terminal safely.

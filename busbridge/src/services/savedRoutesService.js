@@ -229,7 +229,9 @@ export async function saveRoute(routeOrJourney) {
       await supabase.from("saved_routes").insert([
         { route_id: item.id, saved_at: item.savedAt },
       ]);
-    } catch (_) {}
+    } catch (_err) {
+      // Fallback gracefully to local storage
+    }
   }
 
   const updated = [item, ...saved];
@@ -255,7 +257,9 @@ export async function unsaveRoute(routeId) {
   if (supabase) {
     try {
       await supabase.from("saved_routes").delete().eq("route_id", routeId);
-    } catch (_) {}
+    } catch (_err) {
+      // Fallback gracefully to local storage
+    }
   }
 
   const current = getLocalSaved();
@@ -292,7 +296,9 @@ export async function getSavedRoutes() {
         .select("*")
         .order("saved_at", { ascending: false });
       if (!error && Array.isArray(data) && data.length > 0) return data;
-    } catch (_) {}
+    } catch (_err) {
+      // Fallback gracefully to local storage
+    }
   }
   return getLocalSaved();
 }

@@ -136,7 +136,7 @@ export default function CrowdStatusCard({
       {/* Passenger Notes if provided */}
       {notes && (
         <div className="bg-white/80 rounded-xl p-3 border border-gray-100 text-xs text-gray-700 italic">
-          "{notes}"
+          &ldquo;{notes}&rdquo;
         </div>
       )}
 

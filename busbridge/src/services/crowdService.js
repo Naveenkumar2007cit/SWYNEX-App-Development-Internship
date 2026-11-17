@@ -96,7 +96,9 @@ function recordCooldown(busNumber, stopLocation = "") {
     const key = `${(busNumber || "").trim().toLowerCase()}-${(stopLocation || "").trim().toLowerCase()}`;
     cooldowns[key] = Date.now();
     localStorage.setItem(COOLDOWN_KEY, JSON.stringify(cooldowns));
-  } catch (_) {}
+  } catch (_err) {
+    // Gracefully handle storage errors
+  }
 }
 
 /**
@@ -149,7 +151,9 @@ export async function submitCrowdReport({
   if (supabase) {
     try {
       await supabase.from("crowd_reports").insert([report]);
-    } catch (_) {}
+    } catch (_err) {
+      // Continue with local storage on network/supabase error
+    }
   }
 
   const existing = getStoredCrowdReports();

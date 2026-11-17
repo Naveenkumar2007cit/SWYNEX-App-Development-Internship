@@ -239,7 +239,7 @@ export default function ReportIssue() {
           <span>Demo Community System</span>
         </div>
         <p className="opacity-90 leading-relaxed">
-          Reports are stored in your browser's persistent localStorage. The interactive status workflow (Pending ➔ Under Review ➔ Resolved) allows testing end-to-end community tracking. Reports are <strong>not directly transmitted to MTC authorities</strong>.
+          Reports are stored in your browser&apos;s persistent localStorage. The interactive status workflow (Pending ➔ Under Review ➔ Resolved) allows testing end-to-end community tracking. Reports are <strong>not directly transmitted to MTC authorities</strong>.
         </p>
       </div>
 

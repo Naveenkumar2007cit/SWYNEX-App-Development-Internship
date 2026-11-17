@@ -190,7 +190,7 @@ export default function SavedRoutes() {
             <span>Clear all saved journeys?</span>
           </div>
           <p className="text-xs text-red-700 leading-relaxed">
-            This will permanently remove all {savedRoutes.length} saved direct routes and transfer journeys from this browser's localStorage. This cannot be undone.
+            This will permanently remove all {savedRoutes.length} saved direct routes and transfer journeys from this browser&apos;s localStorage. This cannot be undone.
           </p>
           <div className="flex gap-2 pt-1">
             <button
@@ -410,7 +410,7 @@ export default function SavedRoutes() {
               No matching saved journeys found
             </h3>
             <p className="text-xs text-gray-400">
-              No saved routes match the query "{searchQuery}" under the current filter.
+              No saved routes match the query &ldquo;{searchQuery}&rdquo; under the current filter.
             </p>
             <button
               onClick={() => {

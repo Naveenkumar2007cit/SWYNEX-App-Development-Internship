@@ -150,7 +150,9 @@ export async function submitIssueReport({
   if (supabase) {
     try {
       await supabase.from("issue_reports").insert([newReport]);
-    } catch (_) {}
+    } catch (_err) {
+      // Continue with local storage on network/supabase error
+    }
   }
 
   const existing = getStoredIssues();

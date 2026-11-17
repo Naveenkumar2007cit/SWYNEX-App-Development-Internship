@@ -20,7 +20,9 @@ export async function searchRoutes(from, to) {
     try {
       const { data, error } = await supabase.from("bus_routes").select("*").ilike("from_stop", `%${from}%`).ilike("to_stop", `%${to}%`);
       if (!error && data) return data;
-    } catch (_) {}
+    } catch (_err) {
+      // Fallback to local demo dataset
+    }
   }
   return demoRoutes.filter((r) => routeMatches(r, from, to));
 }
@@ -30,7 +32,9 @@ export async function getRouteById(id) {
     try {
       const { data, error } = await supabase.from("bus_routes").select("*").eq("id", id).single();
       if (!error && data) return data;
-    } catch (_) {}
+    } catch (_err) {
+      // Fallback to local demo dataset
+    }
   }
   return demoRoutes.find((r) => r.id === id) || null;
 }

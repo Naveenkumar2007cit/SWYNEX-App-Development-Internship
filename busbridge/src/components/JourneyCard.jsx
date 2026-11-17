@@ -19,9 +19,6 @@ import {
 } from "../services/savedRoutesService.js";
 
 export default function JourneyCard({ journey, onSelect, isSelected = false }) {
-  if (!journey) return null;
-
-  const isDirect = journey.transfersCount === 0;
   const [saved, setSaved] = useState(() => isRouteSaved(journey));
   const [toast, setToast] = useState(null); // { type: 'success' | 'warning', message: string }
 
@@ -35,6 +32,10 @@ export default function JourneyCard({ journey, onSelect, isSelected = false }) {
     window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, handleUpdate);
     return () => window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, handleUpdate);
   }, [journey]);
+
+  if (!journey) return null;
+
+  const isDirect = journey.transfersCount === 0;
 
   const triggerToast = (type, message) => {
     setToast({ type, message });
