@@ -155,8 +155,8 @@ export default function Home() {
           <form onSubmit={handleSearch} className="space-y-2.5">
             {/* From Input with Autocomplete */}
             <div ref={fromBoxRef} className="relative">
-              <div className="backdrop-blur-md bg-white/95 text-slate-800 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-md focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
-                <div className="h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0" />
+              <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
+                <div className="h-3.5 w-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0" />
                 <input
                   value={from}
                   onChange={(e) => {
@@ -165,13 +165,13 @@ export default function Home() {
                   }}
                   onFocus={() => setShowFromSuggestions(true)}
                   placeholder="Starting stop (e.g., Tambaram, Guindy, Koyambedu)"
-                  className="flex-1 text-slate-800 font-medium text-sm outline-none bg-transparent placeholder-slate-400"
+                  className="flex-1 text-slate-900 font-bold text-sm sm:text-base outline-none bg-transparent placeholder-slate-500"
                 />
                 {from && (
                   <button
                     type="button"
                     onClick={() => setFrom("")}
-                    className="text-xs text-slate-400 hover:text-slate-600 font-bold px-1"
+                    className="min-h-[36px] min-w-[36px] flex items-center justify-center text-xs text-slate-400 hover:text-slate-700 font-bold px-1"
                   >
                     ✕
                   </button>
@@ -208,17 +208,17 @@ export default function Home() {
                 type="button"
                 onClick={handleSwapStops}
                 title="Swap source and destination"
-                className="bg-navy-950/80 hover:bg-navy-900 border border-white/20 text-teal-300 p-1.5 rounded-full shadow-md hover:scale-105 transition-all text-xs flex items-center gap-1 px-2.5"
+                className="bg-navy-950/80 hover:bg-navy-900 border border-white/20 text-teal-300 min-h-[36px] px-3 py-1 rounded-full shadow-md hover:scale-105 transition-all text-xs flex items-center gap-1.5"
               >
-                <Shuffle className="h-3 w-3" />
-                <span className="text-[10px] font-semibold">Swap</span>
+                <Shuffle className="h-3.5 w-3.5" />
+                <span className="text-[11px] font-bold">Swap</span>
               </button>
             </div>
 
             {/* To Input with Autocomplete */}
             <div ref={toBoxRef} className="relative">
-              <div className="backdrop-blur-md bg-white/95 text-slate-800 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-md focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
-                <div className="h-3 w-3 rounded-full bg-rose-500 ring-4 ring-rose-100 flex-shrink-0" />
+              <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
+                <div className="h-3.5 w-3.5 rounded-full bg-rose-500 ring-4 ring-rose-100 flex-shrink-0" />
                 <input
                   value={to}
                   onChange={(e) => {
@@ -227,13 +227,13 @@ export default function Home() {
                   }}
                   onFocus={() => setShowToSuggestions(true)}
                   placeholder="Destination stop (e.g., Broadway, Adyar, Velachery)"
-                  className="flex-1 text-slate-800 font-medium text-sm outline-none bg-transparent placeholder-slate-400"
+                  className="flex-1 text-slate-900 font-bold text-sm sm:text-base outline-none bg-transparent placeholder-slate-500"
                 />
                 {to && (
                   <button
                     type="button"
                     onClick={() => setTo("")}
-                    className="text-xs text-slate-400 hover:text-slate-600 font-bold px-1"
+                    className="min-h-[36px] min-w-[36px] flex items-center justify-center text-xs text-slate-400 hover:text-slate-700 font-bold px-1"
                   >
                     ✕
                   </button>
@@ -365,15 +365,15 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Responsive interactive route pills with min 44x44px touch-friendly tap area */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Routes:</span>
+              {/* Responsive interactive route pills with min 48px touch-friendly tap area and generous spacing */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold text-slate-400 uppercase mr-0.5">Routes:</span>
                 {stop.routes.map((r) => (
                   <button
                     key={r}
                     onClick={() => navigate(`/search?query=${encodeURIComponent(r)}`)}
                     title={`View schedule for Bus ${r}`}
-                    className="min-h-[44px] min-w-[44px] px-3 py-2 text-xs bg-navy-900 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                    className="min-h-[48px] min-w-[48px] px-3.5 py-2.5 text-xs bg-navy-900 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/10"
                   >
                     {r}
                   </button>

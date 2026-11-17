@@ -8,7 +8,6 @@ const navItems = [
   { to: "/",        icon: Bus,        label: "Home" },
   { to: "/planner", icon: Compass,    label: "Planner" },
   { to: "/nearby",  icon: Navigation, label: "Nearby" },
-  { to: "/search",  icon: Search,     label: "Search" },
   { to: "/alerts",  icon: Bell,       label: "Alerts", hasAlertBadge: true },
   { to: "/saved",   icon: Bookmark,   label: "Saved", hasSavedBadge: true },
 ];
