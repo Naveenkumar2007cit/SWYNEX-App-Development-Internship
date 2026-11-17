@@ -2,6 +2,7 @@ import { demoRoutes } from "../data/demoRoutes.js";
 
 const STORAGE_ALERTS_KEY = "busbridge_service_alerts";
 const STORAGE_NOTIF_READS_KEY = "busbridge_notifications_read";
+const STORAGE_DISMISSED_ALERTS_KEY = "busbridge_dismissed_alerts";
 export const ALERTS_CHANGE_EVENT = "busbridge_alerts_changed";
 export const NOTIFICATIONS_CHANGE_EVENT = "busbridge_notifications_changed";
 
@@ -138,6 +139,35 @@ export function clearNotificationHistory() {
   localStorage.setItem(STORAGE_NOTIF_READS_KEY, JSON.stringify(allIds));
   notifyNotifsChange();
   return { success: true, message: "Notification history cleared." };
+}
+
+/**
+ * Dismissed Alerts Tracking (collapses/hides banner for user session and persistence)
+ */
+export function getDismissedAlertIds() {
+  if (typeof window === "undefined" || !window.localStorage) return new Set();
+  try {
+    const raw = localStorage.getItem(STORAGE_DISMISSED_ALERTS_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
+}
+
+export function dismissAlert(alertId) {
+  if (!alertId || typeof window === "undefined" || !window.localStorage) return;
+  const dismissed = getDismissedAlertIds();
+  dismissed.add(alertId);
+  localStorage.setItem(STORAGE_DISMISSED_ALERTS_KEY, JSON.stringify(Array.from(dismissed)));
+  notifyAlertsChange();
+}
+
+export function restoreDismissedAlerts() {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  localStorage.removeItem(STORAGE_DISMISSED_ALERTS_KEY);
+  notifyAlertsChange();
 }
 
 /**

@@ -152,22 +152,28 @@ export default function JourneyCard({ journey, onSelect, isSelected = false }) {
         ))}
       </div>
 
-      {/* Origin -> Destination description */}
+      {/* Origin -> Destination description with tooltip and overflow resilience */}
       <div className="mt-3 flex items-start gap-2 text-xs text-gray-600 border-t border-gray-100 pt-2.5">
-        <div className="flex flex-col items-center mt-0.5">
+        <div className="flex flex-col items-center mt-1">
           <div className="h-2 w-2 rounded-full bg-teal-500" />
           <div className="w-0.5 h-4 bg-gray-200" />
           <div className="h-2 w-2 rounded-full bg-navy-800" />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="truncate font-medium text-gray-800">
+        <div className="flex-1 min-w-0 pr-2">
+          <div
+            className="truncate font-semibold text-gray-800"
+            title={journey.origin}
+          >
             {journey.origin}
           </div>
-          <div className="truncate font-medium text-gray-800">
+          <div
+            className="truncate font-semibold text-gray-800"
+            title={journey.destination}
+          >
             {journey.destination}
           </div>
         </div>
-        <div className="text-right text-xs text-gray-400">
+        <div className="text-right text-xs text-gray-400 flex-shrink-0">
           <div>📍 {journey.totalStopsCount} stops</div>
           <div>📏 ~{journey.totalDistance} km</div>
         </div>

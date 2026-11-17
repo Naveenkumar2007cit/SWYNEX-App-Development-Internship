@@ -41,7 +41,7 @@ export default function BottomNavigation() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-white/90 border-t border-emerald-100 lg:hidden safe-area-pb shadow-lg shadow-emerald-950/5">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-white/95 dark:bg-navy-950/95 border-t border-emerald-100 dark:border-white/10 lg:hidden safe-area-pb shadow-lg shadow-emerald-950/5">
       <div className="flex">
         {navItems.map(({ to, icon: Icon, label, hasSavedBadge, hasAlertBadge }) => (
           <NavLink
@@ -49,14 +49,16 @@ export default function BottomNavigation() {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex-1 py-2 flex flex-col items-center justify-center text-[10px] font-semibold transition-all relative ${
-                isActive ? "text-emerald-700" : "text-slate-500 hover:text-emerald-600"
+              `flex-1 min-h-[50px] py-1.5 flex flex-col items-center justify-center text-[10px] font-semibold transition-all relative select-none active:scale-95 ${
+                isActive
+                  ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                  : "text-slate-500 dark:text-slate-400 hover:text-emerald-600"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className={`p-1 rounded-xl transition-all relative ${isActive ? "bg-emerald-100/70 text-emerald-700 scale-110" : ""}`}>
+                <div className={`p-1.5 rounded-xl transition-all relative ${isActive ? "bg-emerald-100/70 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 scale-105" : ""}`}>
                   <Icon className="h-5 w-5" />
                   {hasSavedBadge && savedCount > 0 && (
                     <span className="absolute -top-1 -right-1.5 bg-amber-400 text-slate-950 font-black text-[9px] px-1 rounded-full shadow-xs">

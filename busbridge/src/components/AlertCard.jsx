@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import {
   AlertTriangle,
   Info,
@@ -12,6 +12,8 @@ import {
   Calendar,
   ShieldAlert,
   Star,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 const severityConfig = {
@@ -30,7 +32,9 @@ function AlertCard({
   isRead = false,
   isRelevant = false,
   showActions = true,
+  collapsible = true,
 }) {
+  const [collapsed, setCollapsed] = useState(false);
   if (!alert) return null;
 
   const sevKey = (alert.severity || "info").toLowerCase();
@@ -48,7 +52,7 @@ function AlertCard({
 
   return (
     <div
-      className={`${c.bg} ${c.border} border-2 rounded-2xl p-4 sm:p-5 transition-all relative overflow-hidden shadow-md space-y-3 backdrop-blur-sm ${
+      className={`${c.bg} ${c.border} border-2 rounded-2xl p-4 sm:p-5 transition-all relative overflow-hidden shadow-sm hover:shadow-md space-y-3 backdrop-blur-sm ${
         isRelevant ? "ring-2 ring-amber-400 ring-offset-1" : ""
       } ${isRead ? "opacity-75" : "opacity-100"}`}
     >
@@ -79,84 +83,100 @@ function AlertCard({
           )}
         </div>
 
-        {/* Read / Unread toggle and dismiss */}
-        {showActions && (
-          <div className="flex items-center gap-1 flex-shrink-0">
-            {onToggleRead && (
-              <button
-                onClick={() => onToggleRead(alert.id)}
-                className={`text-[11px] font-medium px-2 py-1 rounded-lg transition-colors border ${
-                  isRead
-                    ? "bg-white/60 text-gray-500 border-gray-200 hover:bg-white"
-                    : "bg-teal-600 text-white border-teal-500 hover:bg-teal-700"
-                }`}
-                title={isRead ? "Mark as unread" : "Mark as read"}
-              >
-                {isRead ? "Mark Unread" : "Mark Read"}
-              </button>
-            )}
+        {/* Action Controls: Collapse Toggle, Read/Unread, Dismiss */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {collapsible && (
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="min-h-[36px] min-w-[36px] flex items-center justify-center text-slate-600 hover:text-slate-900 rounded-lg hover:bg-black/5 transition-colors"
+              title={collapsed ? "Expand advisory details" : "Collapse advisory details"}
+              aria-label={collapsed ? "Expand advisory details" : "Collapse advisory details"}
+            >
+              {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </button>
+          )}
 
-            {onDismiss && (
-              <button
-                onClick={() => onDismiss(alert.id)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-black/5"
-                title="Dismiss"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        )}
+          {showActions && onToggleRead && (
+            <button
+              onClick={() => onToggleRead(alert.id)}
+              className={`text-[11px] font-semibold px-2.5 py-1.5 min-h-[36px] rounded-xl transition-all border active:scale-95 ${
+                isRead
+                  ? "bg-white/70 text-gray-600 border-gray-200 hover:bg-white"
+                  : "bg-teal-600 text-white border-teal-500 hover:bg-teal-700 shadow-xs"
+              }`}
+              title={isRead ? "Mark as unread" : "Mark as read"}
+            >
+              {isRead ? "Mark Unread" : "Mark Read"}
+            </button>
+          )}
+
+          {onDismiss && (
+            <button
+              onClick={() => onDismiss(alert.id)}
+              className="min-h-[36px] min-w-[36px] flex items-center justify-center text-gray-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 transition-colors active:scale-95"
+              title="Dismiss advisory"
+              aria-label="Dismiss advisory"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Title & Description */}
+      {/* Title */}
       <div>
         <h4 className={`font-bold text-sm sm:text-base ${c.text} leading-snug`}>
           {alert.title}
         </h4>
-        <p className={`text-xs mt-1 ${c.text} opacity-90 leading-relaxed`}>
-          {alert.message || alert.description}
-        </p>
-      </div>
-
-      {/* Affected Route Pills */}
-      {alert.affectedRoutes && alert.affectedRoutes.length > 0 && (
-        <div className="flex items-center gap-1.5 flex-wrap pt-1">
-          <span className="text-[11px] font-semibold text-gray-500 flex items-center gap-1">
-            <Bus className="h-3 w-3" /> Affected:
-          </span>
-          {alert.affectedRoutes.map((r) => (
-            <span
-              key={r}
-              className="bg-navy-800 text-white font-bold text-xs px-2.5 py-0.5 rounded-lg shadow-xs"
-            >
-              Bus {r}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Affected Stops if present */}
-      {alert.affectedStops && alert.affectedStops.length > 0 && (
-        <div className="flex items-center gap-1.5 flex-wrap text-[11px] text-gray-600">
-          <MapPin className="h-3 w-3 text-teal-600" />
-          <span>Stops: {alert.affectedStops.join(", ")}</span>
-        </div>
-      )}
-
-      {/* Footer Timing Metadata */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-gray-500 pt-2 border-t border-gray-200/50 gap-1">
-        <span className="flex items-center gap-1">
-          <Calendar className="h-3 w-3 text-gray-400" />
-          Posted: {alert.createdAt || alert.startDate ? new Date(alert.createdAt || alert.startDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "Active"}
-        </span>
-
-        {alert.expiresAt && (
-          <span className="text-gray-400">
-            Valid until: {new Date(alert.expiresAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
-          </span>
+        {!collapsed && (
+          <p className={`text-xs mt-1.5 ${c.text} opacity-90 leading-relaxed transition-all`}>
+            {alert.message || alert.description}
+          </p>
         )}
       </div>
+
+      {!collapsed && (
+        <>
+          {/* Affected Route Pills with enlarged touch targets */}
+          {alert.affectedRoutes && alert.affectedRoutes.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap pt-1">
+              <span className="text-[11px] font-semibold text-gray-500 flex items-center gap-1">
+                <Bus className="h-3 w-3" /> Affected:
+              </span>
+              {alert.affectedRoutes.map((r) => (
+                <span
+                  key={r}
+                  className="bg-navy-800 text-white font-bold text-xs px-2.5 py-1 rounded-xl shadow-xs"
+                >
+                  Bus {r}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Affected Stops if present */}
+          {alert.affectedStops && alert.affectedStops.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap text-[11px] text-gray-600">
+              <MapPin className="h-3 w-3 text-teal-600" />
+              <span>Stops: {alert.affectedStops.join(", ")}</span>
+            </div>
+          )}
+
+          {/* Footer Timing Metadata */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-gray-500 pt-2 border-t border-gray-200/50 gap-1">
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3 w-3 text-gray-400" />
+              Posted: {alert.createdAt || alert.startDate ? new Date(alert.createdAt || alert.startDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "Active"}
+            </span>
+
+            {alert.expiresAt && (
+              <span className="text-gray-400">
+                Valid until: {new Date(alert.expiresAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+              </span>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

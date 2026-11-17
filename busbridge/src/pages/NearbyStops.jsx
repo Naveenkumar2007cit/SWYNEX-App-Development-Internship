@@ -152,21 +152,42 @@ export default function NearbyStops() {
         </span>
       </div>
 
-      {/* Location Status Alerts (Permission denied / Error feedback) */}
+      {/* Location Status Alerts (Permission denied / Error feedback with inline manual entry fallback) */}
       {statusMessage && (
         <div
-          className={`p-4 rounded-2xl text-xs sm:text-sm border flex items-start gap-2.5 ${
+          className={`p-4 sm:p-5 rounded-2xl text-xs sm:text-sm border shadow-sm space-y-3 transition-all ${
             locationStatus === "denied"
-              ? "bg-amber-50 border-amber-200 text-amber-900"
-              : "bg-red-50 border-red-200 text-red-900"
+              ? "bg-amber-50/90 border-amber-300 text-amber-950"
+              : "bg-rose-50/90 border-rose-300 text-rose-950"
           }`}
         >
-          <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5 text-amber-600" />
-          <div className="flex-1">
-            <p className="font-semibold">{statusMessage}</p>
-            <p className="mt-1 text-xs opacity-90">
-              Pick one of the major Chennai transit anchors below to continue discovering stops.
-            </p>
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5 text-amber-600" />
+            <div className="flex-1">
+              <p className="font-bold text-sm">{statusMessage}</p>
+              <p className="mt-1 text-xs text-amber-900/90 leading-relaxed">
+                Browser location was blocked or unavailable. You can enter any Chennai stop or area manually below, or select a pre-configured transit anchor to snap your radar view.
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Manual Area Search Fallback */}
+          <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              placeholder="Type area (e.g. Guindy, Tambaram, T. Nagar)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-white border border-amber-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <button
+              type="button"
+              onClick={() => handleSelectManualAnchor(CHENNAI_MANUAL_ANCHORS[0])}
+              className="bg-navy-800 hover:bg-navy-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5"
+            >
+              <MapPin className="h-3.5 w-3.5 text-teal-400" />
+              Use Guindy Anchor
+            </button>
           </div>
         </div>
       )}
@@ -385,29 +406,29 @@ export default function NearbyStops() {
                     </span>
                   </div>
 
-                  {/* Passing Routes */}
-                  <div className="flex items-center gap-1 flex-wrap pt-1">
+                  {/* Passing Routes with touch-friendly targets */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
                     <span className="text-[11px] text-gray-400 flex items-center gap-0.5 mr-1">
                       <Bus className="h-3 w-3" /> Routes:
                     </span>
                     {stop.routes.slice(0, 4).map((r) => (
                       <span
                         key={r}
-                        className="bg-navy-800 text-white font-bold text-[11px] px-2 py-0.5 rounded-md"
+                        className="bg-navy-800 text-white font-black text-xs min-h-[36px] min-w-[36px] px-2.5 py-1.5 rounded-xl flex items-center justify-center shadow-xs"
                       >
                         {r}
                       </span>
                     ))}
                     {stop.routes.length > 4 && (
-                      <span className="text-[10px] text-gray-400 font-medium">
+                      <span className="text-xs text-gray-500 font-semibold px-1">
                         +{stop.routes.length - 4} more
                       </span>
                     )}
                   </div>
 
                   {/* Quick Action Footer */}
-                  <div className="pt-2 border-t border-gray-50 flex items-center justify-between text-[11px]">
-                    <span className="text-gray-400">
+                  <div className="pt-2 border-t border-gray-50 flex items-center justify-between text-xs">
+                    <span className="text-gray-400 font-medium">
                       {stop.lat?.toFixed(4)}, {stop.lng?.toFixed(4)}
                     </span>
                     <button
@@ -416,7 +437,7 @@ export default function NearbyStops() {
                         e.stopPropagation();
                         handlePlanFromStop(stop.name);
                       }}
-                      className="text-teal-600 font-bold hover:underline flex items-center gap-0.5"
+                      className="min-h-[44px] px-3 py-2 text-teal-600 font-bold hover:text-teal-700 hover:bg-teal-50 rounded-xl transition-all flex items-center gap-1 active:scale-95"
                     >
                       Plan Trip →
                     </button>

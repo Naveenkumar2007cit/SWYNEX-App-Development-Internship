@@ -21,7 +21,15 @@ import {
 } from "lucide-react";
 import { getRecentSearches } from "../services/routeService.js";
 import { getSavedRoutes, SAVED_ROUTES_CHANGE_EVENT } from "../services/savedRoutesService.js";
-import { getStoredAlerts, getReadNotificationIds, NOTIFICATIONS_CHANGE_EVENT } from "../services/alertService.js";
+import {
+  getStoredAlerts,
+  getReadNotificationIds,
+  getDismissedAlertIds,
+  dismissAlert,
+  restoreDismissedAlerts,
+  NOTIFICATIONS_CHANGE_EVENT,
+  ALERTS_CHANGE_EVENT,
+} from "../services/alertService.js";
 import { nearbyStops, allStopNames } from "../data/demoRoutes.js";
 import AlertCard from "../components/AlertCard.jsx";
 
@@ -44,13 +52,28 @@ export default function Home() {
     return allStopNames.filter((s) => s.toLowerCase().includes(q)).slice(0, 6);
   };
 
+  const [dismissedCount, setDismissedCount] = useState(0);
+
   const loadAll = () => {
     getSavedRoutes().then(setSaved);
+    const dismissed = getDismissedAlertIds();
     const storedAlerts = getStoredAlerts().filter((a) => a.isActive);
-    setAlerts(storedAlerts.slice(0, 2));
+    const visibleAlerts = storedAlerts.filter((a) => !dismissed.has(a.id));
+    setAlerts(visibleAlerts.slice(0, 2));
+    setDismissedCount(storedAlerts.filter((a) => dismissed.has(a.id)).length);
 
     const reads = getReadNotificationIds();
     setUnreadAlertCount(storedAlerts.filter((a) => !reads.has(a.id)).length);
+  };
+
+  const handleDismissAlert = (id) => {
+    dismissAlert(id);
+    loadAll();
+  };
+
+  const handleRestoreAlerts = () => {
+    restoreDismissedAlerts();
+    loadAll();
   };
 
   useEffect(() => {
@@ -69,10 +92,12 @@ export default function Home() {
 
     window.addEventListener(SAVED_ROUTES_CHANGE_EVENT, loadAll);
     window.addEventListener(NOTIFICATIONS_CHANGE_EVENT, loadAll);
+    window.addEventListener(ALERTS_CHANGE_EVENT, loadAll);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener(SAVED_ROUTES_CHANGE_EVENT, loadAll);
       window.removeEventListener(NOTIFICATIONS_CHANGE_EVENT, loadAll);
+      window.removeEventListener(ALERTS_CHANGE_EVENT, loadAll);
     };
   }, []);
 
@@ -278,10 +303,10 @@ export default function Home() {
             <button
               key={to}
               onClick={() => navigate(to)}
-              className="backdrop-blur-md bg-white/80 hover:bg-white rounded-2xl shadow-sm hover:shadow-md p-4 flex flex-col justify-between transition-all border border-emerald-950/5 hover:border-emerald-200 text-left relative overflow-hidden group hover:-translate-y-0.5"
+              className="backdrop-blur-md bg-white/80 hover:bg-white rounded-2xl shadow-sm hover:shadow-md p-4 min-h-[96px] flex flex-col justify-between transition-all border border-emerald-950/5 hover:border-emerald-200 text-left relative overflow-hidden group hover:-translate-y-0.5 active:scale-95"
             >
-              <div className="flex items-start justify-between w-full mb-3">
-                <div className={`bg-gradient-to-tr ${color} p-2.5 rounded-xl text-white shadow-sm group-hover:scale-110 transition-transform`}>
+              <div className="flex items-start justify-between w-full mb-2">
+                <div className={`bg-gradient-to-tr ${color} p-2 rounded-xl text-white shadow-xs group-hover:scale-105 transition-transform`}>
                   <Icon className="h-4 w-4" />
                 </div>
                 {badge > 0 && (
@@ -340,7 +365,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Responsive interactive route pills */}
+              {/* Responsive interactive route pills with min 44x44px touch-friendly tap area */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Routes:</span>
                 {stop.routes.map((r) => (
@@ -348,7 +373,7 @@ export default function Home() {
                     key={r}
                     onClick={() => navigate(`/search?query=${encodeURIComponent(r)}`)}
                     title={`View schedule for Bus ${r}`}
-                    className="text-xs bg-navy-900 hover:bg-emerald-700 text-white font-black px-2.5 py-1 rounded-xl shadow-xs transition-all hover:scale-105 active:scale-95"
+                    className="min-h-[44px] min-w-[44px] px-3 py-2 text-xs bg-navy-900 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
                   >
                     {r}
                   </button>
@@ -428,28 +453,54 @@ export default function Home() {
         </div>
       )}
 
-      {/* Service alerts preview */}
-      {alerts.length > 0 && (
+      {/* Service alerts preview with dismiss & restore support */}
+      {alerts.length > 0 ? (
         <div>
           <div className="flex items-center justify-between mb-3 px-1">
             <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
               <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
               Active Service Advisories
             </h2>
-            <button
-              onClick={() => navigate("/alerts")}
-              className="text-xs text-emerald-700 font-bold hover:underline"
-            >
-              Alerts Center →
-            </button>
+            <div className="flex items-center gap-2">
+              {dismissedCount > 0 && (
+                <button
+                  onClick={handleRestoreAlerts}
+                  className="text-xs text-gray-500 hover:text-emerald-700 underline font-medium"
+                >
+                  Restore ({dismissedCount})
+                </button>
+              )}
+              <button
+                onClick={() => navigate("/alerts")}
+                className="text-xs text-emerald-700 font-bold hover:underline"
+              >
+                Alerts Center →
+              </button>
+            </div>
           </div>
           <div className="space-y-3">
             {alerts.map((alert) => (
-              <AlertCard key={alert.id} alert={alert} showActions={false} />
+              <AlertCard
+                key={alert.id}
+                alert={alert}
+                showActions={false}
+                collapsible={true}
+                onDismiss={handleDismissAlert}
+              />
             ))}
           </div>
         </div>
-      )}
+      ) : dismissedCount > 0 ? (
+        <div className="backdrop-blur-md bg-white/70 border border-gray-100 rounded-2xl p-3 flex items-center justify-between text-xs text-gray-500">
+          <span>{dismissedCount} advisory banner(s) dismissed on this device.</span>
+          <button
+            onClick={handleRestoreAlerts}
+            className="text-xs text-emerald-700 font-bold hover:underline"
+          >
+            Show Advisories
+          </button>
+        </div>
+      ) : null}
 
       {/* Quick Access Floating Action Button (FAB) on Mobile */}
       <div className="fixed bottom-20 right-4 z-30 lg:hidden">
