@@ -147,20 +147,49 @@ export async function submitIssueReport({
   };
 
   // Optional Supabase submission
+  let cloudSaved = false;
   if (supabase) {
     try {
-      await supabase.from("issue_reports").insert([newReport]);
-    } catch (_err) {
-      // Continue with local storage on network/supabase error
+      const payload = {
+        id: uniqueId,
+        title: normTitle,
+        category: normCategory,
+        bus_number: normBus,
+        location: normLocation,
+        description: normDesc,
+        route_id: routeId || null,
+        image_attachment: imageAttachment || null,
+        status: "pending",
+        timeline: [
+          {
+            status: "pending",
+            note: "Issue report submitted by passenger.",
+            timestamp: now,
+            author: "Passenger (Community)",
+          },
+        ],
+        reported_at: now,
+        updated_at: now,
+      };
+      const { error } = await supabase.from("issue_reports").insert([payload]);
+      if (error) {
+        console.warn("Supabase issue_reports insert failed; fallback to local storage:", error.message);
+      } else {
+        cloudSaved = true;
+      }
+    } catch (err) {
+      console.warn("Supabase network error; fallback to local storage:", err.message);
     }
   }
 
   const existing = getStoredIssues();
   setStoredIssues([newReport, ...existing]);
 
+  const statusNote = cloudSaved ? " (synced to cloud)" : "";
   return {
     success: true,
-    message: `Issue report ${uniqueId} submitted successfully.`,
+    cloudSaved,
+    message: `Issue report ${uniqueId} submitted successfully.${statusNote}`,
     report: newReport,
   };
 }
@@ -308,5 +337,36 @@ export function initializeBaselineIssues() {
   setStoredIssues(sampleIssues);
 }
 
-// Backwards compatibility alias
-export const getIssueReports = getStoredIssues;
+// Backwards compatibility alias & cloud fetcher
+export async function getIssueReports() {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("issue_reports")
+        .select("*")
+        .order("reported_at", { ascending: false });
+
+      if (error) {
+        console.warn("Supabase issue_reports fetch error; fallback to local storage:", error.message);
+      } else if (Array.isArray(data) && data.length > 0) {
+        return data.map((d) => ({
+          id: d.id,
+          title: d.title,
+          category: d.category,
+          busNumber: d.bus_number,
+          location: d.location,
+          description: d.description,
+          routeId: d.route_id,
+          imageAttachment: d.image_attachment,
+          status: d.status || "pending",
+          timeline: d.timeline || [],
+          reportedAt: d.reported_at,
+          updatedAt: d.updated_at,
+        }));
+      }
+    } catch (err) {
+      console.warn("Supabase issue_reports fetch network error; fallback to local storage:", err.message);
+    }
+  }
+  return getStoredIssues();
+}

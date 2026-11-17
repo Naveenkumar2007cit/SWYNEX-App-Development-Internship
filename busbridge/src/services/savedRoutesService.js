@@ -224,13 +224,31 @@ export async function saveRoute(routeOrJourney) {
   }
 
   // Optional Supabase persistence if available
+  let cloudSaved = false;
   if (supabase) {
     try {
-      await supabase.from("saved_routes").insert([
-        { route_id: item.id, saved_at: item.savedAt },
-      ]);
-    } catch (_err) {
-      // Fallback gracefully to local storage
+      const payload = {
+        id: item.id,
+        route_id: item.id,
+        bus_number: item.busNumber || null,
+        name: item.name || null,
+        from_stop: item.from,
+        to_stop: item.to,
+        journey_type: item.type || "direct",
+        duration: item.duration || 0,
+        distance: item.distance || 0,
+        transfers_count: item.transfersCount || 0,
+        legs: item.legs || [],
+        saved_at: item.savedAt,
+      };
+      const { error } = await supabase.from("saved_routes").insert([payload]);
+      if (error) {
+        console.warn("Supabase saved_routes insert failed; using localStorage fallback:", error.message);
+      } else {
+        cloudSaved = true;
+      }
+    } catch (err) {
+      console.warn("Supabase network error; using localStorage fallback:", err.message);
     }
   }
 
@@ -238,9 +256,11 @@ export async function saveRoute(routeOrJourney) {
   setLocalSaved(updated);
 
   const busLabel = item.busNumber ? `Bus ${item.busNumber}` : "Journey";
+  const statusNote = cloudSaved ? " (synced to cloud)" : "";
   return {
     success: true,
-    message: `${busLabel} (${item.from} ➔ ${item.to}) saved to favourites!`,
+    cloudSaved,
+    message: `${busLabel} (${item.from} ➔ ${item.to}) saved to favourites!${statusNote}`,
     route: item,
   };
 }
@@ -295,9 +315,33 @@ export async function getSavedRoutes() {
         .from("saved_routes")
         .select("*")
         .order("saved_at", { ascending: false });
-      if (!error && Array.isArray(data) && data.length > 0) return data;
-    } catch (_err) {
-      // Fallback gracefully to local storage
+
+      if (error) {
+        console.warn("Supabase saved_routes fetch failed; fallback to local storage:", error.message);
+      } else if (Array.isArray(data) && data.length > 0) {
+        // Map database snake_case back to application camelCase
+        const mapped = data.map((d) => ({
+          id: d.id,
+          type: d.journey_type || "direct",
+          from: d.from_stop,
+          to: d.to_stop,
+          origin: d.from_stop,
+          destination: d.to_stop,
+          busNumber: d.bus_number || "",
+          name: d.name || "",
+          routeName: d.name || "",
+          transfersCount: d.transfers_count || 0,
+          duration: d.duration || 0,
+          totalDuration: d.duration || 0,
+          distance: Number(d.distance) || 0,
+          totalDistance: Number(d.distance) || 0,
+          legs: d.legs || [],
+          savedAt: d.saved_at,
+        }));
+        return mapped.filter(isValidJourney);
+      }
+    } catch (err) {
+      console.warn("Supabase fetch network error; fallback to local storage:", err.message);
     }
   }
   return getLocalSaved();

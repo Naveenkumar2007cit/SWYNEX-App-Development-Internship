@@ -148,11 +148,28 @@ export async function submitCrowdReport({
     source: "community",
   };
 
+  let cloudSaved = false;
   if (supabase) {
     try {
-      await supabase.from("crowd_reports").insert([report]);
-    } catch (_err) {
-      // Continue with local storage on network/supabase error
+      const payload = {
+        id: report.id,
+        route_id: report.routeId,
+        bus_number: report.busNumber,
+        route_name: report.routeName,
+        stop_location: report.stopLocation,
+        crowd_level: report.crowdLevel,
+        notes: report.notes,
+        source: report.source,
+        reported_at: report.reportedAt,
+      };
+      const { error } = await supabase.from("crowd_reports").insert([payload]);
+      if (error) {
+        console.warn("Supabase crowd_reports insert failed; fallback to local storage:", error.message);
+      } else {
+        cloudSaved = true;
+      }
+    } catch (err) {
+      console.warn("Supabase network error; fallback to local storage:", err.message);
     }
   }
 
@@ -160,9 +177,11 @@ export async function submitCrowdReport({
   setStoredCrowdReports([report, ...existing]);
   recordCooldown(normBus, normStop);
 
+  const statusNote = cloudSaved ? " (synced to cloud)" : "";
   return {
     success: true,
-    message: `Thank you! Your ${normLevel.toUpperCase()} crowd report for Bus ${normBus} has been recorded.`,
+    cloudSaved,
+    message: `Thank you! Your ${normLevel.toUpperCase()} crowd report for Bus ${normBus} has been recorded.${statusNote}`,
     report,
   };
 }
@@ -234,9 +253,36 @@ export function calculateCrowdIntelligence(reports) {
 }
 
 /**
- * Get crowd reports for a specific route
+ * Get crowd reports for a specific route (Supabase with localStorage fallback)
  */
 export async function getCrowdReports(routeIdentifier) {
+  if (supabase) {
+    try {
+      let query = supabase.from("crowd_reports").select("*").order("reported_at", { ascending: false });
+      if (routeIdentifier) {
+        query = query.or(`route_id.ilike.%${routeIdentifier}%,bus_number.ilike.%${routeIdentifier}%`);
+      }
+      const { data, error } = await query;
+      if (error) {
+        console.warn("Supabase crowd_reports query error; fallback to local storage:", error.message);
+      } else if (Array.isArray(data) && data.length > 0) {
+        return data.map((d) => ({
+          id: d.id,
+          routeId: d.route_id,
+          busNumber: d.bus_number,
+          routeName: d.route_name || `Route ${d.bus_number}`,
+          stopLocation: d.stop_location || "",
+          crowdLevel: d.crowd_level,
+          notes: d.notes || "",
+          source: d.source || "community",
+          reportedAt: d.reported_at,
+        }));
+      }
+    } catch (err) {
+      console.warn("Supabase crowd_reports fetch error; fallback to local storage:", err.message);
+    }
+  }
+
   const all = getStoredCrowdReports();
   if (!routeIdentifier) return all;
   const idLower = routeIdentifier.toLowerCase();
