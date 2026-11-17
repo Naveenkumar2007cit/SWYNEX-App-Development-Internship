@@ -54,9 +54,9 @@ export default function Home() {
     if (excludeStop && excludeStop.trim()) {
       pool = pool.filter((s) => !areStopsEqual(s, excludeStop));
     }
-    if (!query || query.trim().length === 0) return pool.slice(0, 6);
+    if (!query || query.trim().length === 0) return pool.slice(0, 10);
     const q = query.toLowerCase().trim();
-    return pool.filter((s) => s.toLowerCase().includes(q)).slice(0, 6);
+    return pool.filter((s) => s.toLowerCase().includes(q)).slice(0, 15);
   };
 
   const [dismissedCount, setDismissedCount] = useState(0);
@@ -249,8 +249,8 @@ export default function Home() {
 
               {/* Suggestions Dropdown */}
               {showFromSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
-                  <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
+                  <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1 sticky top-0 backdrop-blur-md bg-emerald-50/90 z-10 border-b border-emerald-100/60">
                     <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Starting Stops
                   </div>
                   {getFilteredStops(from, to).map((stop) => (
@@ -316,8 +316,8 @@ export default function Home() {
 
               {/* Suggestions Dropdown */}
               {showToSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
-                  <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
+                  <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1 sticky top-0 backdrop-blur-md bg-emerald-50/90 z-10 border-b border-emerald-100/60">
                     <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Destination Stops
                   </div>
                   {getFilteredStops(to, from).map((stop) => (
