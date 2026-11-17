@@ -56,7 +56,7 @@ export default function Home() {
     }
     if (!query || query.trim().length === 0) return pool.slice(0, 10);
     const q = query.toLowerCase().trim();
-    return pool.filter((s) => s.toLowerCase().includes(q)).slice(0, 15);
+    return pool.filter((s) => s.toLowerCase().includes(q)).slice(0, 10);
   };
 
   const [dismissedCount, setDismissedCount] = useState(0);
@@ -173,10 +173,12 @@ export default function Home() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28 md:pb-12 space-y-7">
       {/* Hero with Chennai Emerald Glassmorphism Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-emerald-950 p-6 sm:p-7 text-white shadow-xl shadow-emerald-950/15 border border-white/10">
-        {/* Glow ambient background accents */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-emerald-950 p-6 sm:p-7 text-white shadow-xl shadow-emerald-950/15 border border-white/10">
+        {/* Glow ambient background accents (clipped to preserve card radius) */}
+        <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+          <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+        </div>
 
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-2">
@@ -218,7 +220,7 @@ export default function Home() {
             )}
 
             {/* From Input with Autocomplete */}
-            <div ref={fromBoxRef} className="relative z-20">
+            <div ref={fromBoxRef} className={`relative ${showFromSuggestions ? "z-40" : "z-20"}`}>
               <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
                 <div className="h-3.5 w-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0" />
                 <input
@@ -249,7 +251,7 @@ export default function Home() {
 
               {/* Suggestions Dropdown */}
               {showFromSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
+                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden z-40 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn overscroll-contain">
                   <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1 sticky top-0 backdrop-blur-md bg-emerald-50/90 z-10 border-b border-emerald-100/60">
                     <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Starting Stops
                   </div>
@@ -285,7 +287,7 @@ export default function Home() {
             </div>
 
             {/* To Input with Autocomplete */}
-            <div ref={toBoxRef} className="relative z-10">
+            <div ref={toBoxRef} className={`relative ${showToSuggestions ? "z-40" : "z-20"}`}>
               <div className="bg-white text-slate-900 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-md border-2 border-transparent focus-within:ring-2 focus-within:ring-teal-400 focus-within:border-transparent transition-all">
                 <div className="h-3.5 w-3.5 rounded-full bg-rose-500 ring-4 ring-rose-100 flex-shrink-0" />
                 <input
@@ -316,7 +318,7 @@ export default function Home() {
 
               {/* Suggestions Dropdown */}
               {showToSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-xl border border-emerald-100 overflow-hidden z-30 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn">
+                <div className="absolute top-full left-0 right-0 mt-1.5 backdrop-blur-xl bg-white/95 rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden z-40 max-h-64 sm:max-h-80 md:max-h-[340px] overflow-y-auto divide-y divide-slate-100 animate-fadeIn overscroll-contain">
                   <div className="px-3 py-1.5 bg-emerald-50/70 text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1 sticky top-0 backdrop-blur-md bg-emerald-50/90 z-10 border-b border-emerald-100/60">
                     <MapPin className="h-3 w-3 text-emerald-600" /> Suggested Destination Stops
                   </div>
