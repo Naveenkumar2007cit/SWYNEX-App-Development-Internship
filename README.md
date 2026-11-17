@@ -1,7 +1,8 @@
 # 🚌 BusBridge – Chennai Public Bus Transit Hub
 
-[![Vite](https://img.shields.io/badge/Vite-5.4.10-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.4.6-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
+[![React Router](https://img.shields.io/badge/React_Router_DOM-7.18.5-CA4245?style=flat&logo=react-router&logoColor=white)](https://reactrouter.com/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4.14-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=flat&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![SWYNEX Internship](https://img.shields.io/badge/SWYNEX-Task%204%20Final%20Project-0D9488?style=flat)](https://github.com/Naveenkumar2007cit/SWYNEX-App-Development-Internship)
@@ -125,8 +126,8 @@ Commuters navigating urban public bus transit in Chennai frequently encounter cr
 | Layer | Tools |
 |---|---|
 | **Frontend Framework** | React 18.3.1 |
-| **Build Tool** | Vite 5.4.10 (Rollup manual chunking) |
-| **Routing** | React Router DOM 6.28.0 (Code-split with `React.lazy`) |
+| **Build Tool** | Vite 6.4.6 (esbuild 0.25.12, Rollup manual chunking) |
+| **Routing** | React Router DOM 7.18.5 (Code-split with `React.lazy`) |
 | **Styling** | Tailwind CSS 3.4.14 (with custom `mtc` color tokens & `darkMode: 'class'`) |
 | **Mapping & Geospatial** | Leaflet 1.9.4 & React-Leaflet 4.2.1 |
 | **Iconography** | Lucide React 0.453.0 |

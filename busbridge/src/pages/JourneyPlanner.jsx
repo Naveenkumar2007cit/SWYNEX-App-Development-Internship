@@ -29,12 +29,20 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function JourneyPlanner() {
   const [searchParams] = useSearchParams();
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
+  const initialSource = searchParams.get("source") || searchParams.get("from") || "";
+  const initialDest = searchParams.get("destination") || searchParams.get("to") || "";
+
+  const [source, setSource] = useState(initialSource);
+  const [destination, setDestination] = useState(initialDest);
   const [sourceSuggest, setSourceSuggest] = useState([]);
   const [destSuggest, setDestSuggest] = useState([]);
 
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState(() => {
+    if (initialSource.trim() && initialDest.trim() && initialSource.trim().toLowerCase() === initialDest.trim().toLowerCase()) {
+      return "Starting point and destination cannot be the same.";
+    }
+    return "";
+  });
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [journeys, setJourneys] = useState([]);
